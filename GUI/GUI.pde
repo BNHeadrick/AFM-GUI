@@ -276,9 +276,9 @@ void keyPressed() {
     else
       selectedRule =0;
   }
-  if (key == 'l' || key == 'L') {
-    timeline.addTick();
-  }
+//  if (key == 'l' || key == 'L') {
+//    timeline.addTick();
+//  }
 }
 
 /*
@@ -316,6 +316,7 @@ void oscEvent(OscMessage theOscMessage) {
 
     println(myNewCamera);
 
+    //RAFACTOR THIS PART; MAYBE MAKE A DYNAMIC ENUM IN THE CAM DATA STRUCTURE?
     if (myNewCamera.compareTo("Camera1")==0)
       selectedCamera=0;
     if (myNewCamera.compareTo("Camera2")==0)
@@ -333,6 +334,8 @@ void oscEvent(OscMessage theOscMessage) {
 
     cameras.get(selectedCamera).isSelected = true; 
     cameras.get(selectedCamera).changeToSelectedColor();
+//    println(""  + timeline.getTickArr());
+    timeline.getActiveTick().setCam(cameras.get(selectedCamera));
   }
 
   //Friedrich changed the AddressPattern for the submitted package - we can ignore the first string part of the message

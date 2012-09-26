@@ -1,14 +1,31 @@
 //This class holds the timeline object as well as manage the currently active "Tick" in the application
 
+/*
+so to recap: I'm going to ask Freidrich how MSB handles time. Specifically, it is possible to query the position of a camera and of characters at specific points in time (I think each and all of these are called "actors").
+
+Here's that Box2D library from Daniel Shiffman. 
+http://www.shiffman.net/teaching/nature/box2d-processing/
+I've used it in Processing (the examples are great to play around with!), and it's well documented. Looks like it also has some "mouse interaction" that we could hook into but use the Kinect input instead.
+
+And this is me on github: https://github.com/ashtonyves/
+
+So what we're doing is implementing playback functionality in Processing.
+the playback functions will allow the user to scrub to a point in time.
+For each point in time, there will be a corresponding camera that's active.
+Show this active camera in view for the selected point in time.
+If you want, show the camera that also comes before and after, but show them in a different color (leading up to our "faded" look).
+
+(Once we query time from MSB, we can collect the positions of these cameras in from MSB and map that position onto the GUI screen.)
+
+I'll work on sketching up series of interfaces to communicate how they work together and what sort of information each holds/needs.
+*/
+
 //TODO: tie the camera data structure with tick management
 public class Timeline {
   HScrollbar hs1; //scrollbar
   
   //scrollbar attributes
   public int hsXPos = 50, hsYPos = height-(height/8), hsWidth=width-100, hsHeight = 25, looseVal = 1;
-  
-  
-  
   ArrayList<Tick> tickArr;
     
   Timeline() {
@@ -29,20 +46,41 @@ public class Timeline {
     line(hsXPos, hsYPos, hsWidth+hsXPos, hsYPos);
   }
   
+  //legacy code; don't use
   void addTick(float xPos){
       tickArr.add(new Tick(xPos, hsYPos));
   }
   
   void addTick(){
-      tickArr.add(new Tick());
-//      tickArr.get(tickArr.size()-1).setToActive();
-      for(int i = 0; i<tickArr.size()-1; i++){
+//      tickArr.add(new Tick());
+////      tickArr.get(tickArr.size()-1).setToActive();
+//      for(int i = 0; i<tickArr.size()-1; i++){
+//        tickArr.get(i).setToInActive();
+//      }
+
+    tickArr.add(new Tick(hs1.getSliderPos(), hsYPos));
+          for(int i = 0; i<tickArr.size()-1; i++){
         tickArr.get(i).setToInActive();
       }
   }
   
+  ArrayList<Tick> getTickArr(){
+    return tickArr;
+  }
+  
+  Tick getActiveTick(){
+    for(int i = 0; i<tickArr.size()-1; i++)
+    {
+      if(tickArr.get(i).isActive()){
+        return tickArr.get(i);
+      }
+    }
+    return null;
+  }
+  
   
   class HScrollbar {
+    public int totalTime = 120;    //the total time for the timeline.
     int swidth, sheight;    // width and height of bar
     float xpos, ypos;       // x and y position of bar
     float spos, newspos;    // x position of slider
@@ -59,7 +97,7 @@ public class Timeline {
       ratio = (float)sw / (float)widthtoheight;
       xpos = xp;
       ypos = yp-sheight/2;
-      spos = xpos + swidth/2 - sheight/2;
+      spos = xpos;
       newspos = spos;
       sposMin = xpos;
       sposMax = xpos + swidth - sheight;
@@ -104,6 +142,7 @@ public class Timeline {
       }
     }
   
+    //displays the timeline box and the ticks.
     void display() {
       noStroke();
       fill(204);
@@ -122,24 +161,23 @@ public class Timeline {
         tickArr.get(i).displayTick();
       }
       
-      println(getPos());
+      println(getPosInSeconds());
+      println(getSliderPos());
     }
   
-    float getPos() {
+    public int getPosInSeconds() {
       // Convert spos to be values between
       // 0 and the total width of the scrollbar
 //      return spos * ratio;
-      return spos%(hsWidth - hsXPos);
+      //scrollbar width
+      
+      //return spos;
+      return (int)(((spos-50)/swidth)*totalTime);
     }
     
-//    void displayTick(Tick t){
-////      fill(40, 127, 80);
-////      ellipse(xPos, hsYPos, tickWidth, tickHeight);
-//        fill(40, 127, 80);
-//      ellipse(t.getXPos(), t.getYPos(), t.getWidth(), t.getHeight());
-//    }
-    
-    
+    public float getSliderPos(){
+      return spos;
+    }
     
   }
   

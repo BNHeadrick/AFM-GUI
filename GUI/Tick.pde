@@ -7,7 +7,9 @@ class Tick{
     final color onCol = color(255,0,0);
     color col;
     boolean active;
+    Cam cam;
     
+    //default constructor is only used for testing; do NOT use for normal use yet.
     Tick(){
       float r = random(50, width-100);
       tickXPos = r;
@@ -23,6 +25,12 @@ class Tick{
       tickYPos = tYPos;
       tickWidth = 15;
       tickHeight = tickWidth;
+      col = onCol;
+    }
+    
+    Tick(float tXPos, float tYPos, Cam c){
+      this(tXPos, tYPos);
+      cam = c;
     }
     
     void displayTick(){
@@ -69,5 +77,12 @@ class Tick{
       return col;
     }
     
+    Cam getCam(){
+      return cam;
+    }
+    
+    void setCam(Cam c){
+      cam = c;
+    }
     
 }
