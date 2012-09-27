@@ -31,6 +31,7 @@ class Tick{
     Tick(float tXPos, float tYPos, Cam c){
       this(tXPos, tYPos);
       cam = c;
+      
     }
     
     void displayTick(){
@@ -83,6 +84,18 @@ class Tick{
     
     void setCam(Cam c){
       cam = c;
+    }
+    
+    void changeCamColor(){
+      cam.changeToColor( color(100,100,100));
+    }
+    
+    void changeCamColorPrev(){
+      cam.changeToColor( color(100,100,100, 40));
+    }
+    
+    void changeCamColorNext(){
+      cam.changeToColor( color(0,255,10, 80));
     }
     
 }

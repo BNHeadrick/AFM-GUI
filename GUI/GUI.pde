@@ -276,9 +276,17 @@ void keyPressed() {
     else
       selectedRule =0;
   }
-//  if (key == 'l' || key == 'L') {
-//    timeline.addTick();
-//  }
+  if (key == 'l' || key == 'L') {
+    //if a camera is active, add tick
+    for(int i =0; i<cameras.size(); i++){
+      if(cameras.get(i).camIsSelected()){
+        
+        //need to find which tick is before/after the one that would be placed here
+        //TODO above
+        timeline.addTick(cameras.get(i));
+      }
+    }
+  }
 }
 
 /*

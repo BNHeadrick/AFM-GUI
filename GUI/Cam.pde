@@ -166,5 +166,14 @@ class Cam {
     }
     return false;
   }
+  
+  boolean camIsSelected(){
+    return isSelected;
+  }
+  
+  void changeToColor(color c){
+    col = c;
+  }
+  
 }
 

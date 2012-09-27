@@ -27,6 +27,7 @@ public class Timeline {
   //scrollbar attributes
   public int hsXPos = 50, hsYPos = height-(height/8), hsWidth=width-100, hsHeight = 25, looseVal = 1;
   ArrayList<Tick> tickArr;
+  
     
   Timeline() {
     
@@ -51,17 +52,18 @@ public class Timeline {
       tickArr.add(new Tick(xPos, hsYPos));
   }
   
-  void addTick(){
+  void addTick(Cam c){
 //      tickArr.add(new Tick());
 ////      tickArr.get(tickArr.size()-1).setToActive();
 //      for(int i = 0; i<tickArr.size()-1; i++){
 //        tickArr.get(i).setToInActive();
 //      }
 
-    tickArr.add(new Tick(hs1.getSliderPos(), hsYPos));
-          for(int i = 0; i<tickArr.size()-1; i++){
-        tickArr.get(i).setToInActive();
-      }
+    tickArr.add(new Tick(hs1.getSliderPos(), hsYPos, c));
+    //set the older ticks to inactive
+    for(int i = 0; i<tickArr.size()-1; i++){
+      tickArr.get(i).setToInActive();
+    }
   }
   
   ArrayList<Tick> getTickArr(){
@@ -89,6 +91,7 @@ public class Timeline {
     boolean over;           // is the mouse over the slider?
     boolean locked;
     float ratio;
+    Tick prevTick, nextTick;
   
     HScrollbar (float xp, float yp, int sw, int sh, int l) {
       swidth = sw;
@@ -161,9 +164,79 @@ public class Timeline {
         tickArr.get(i).displayTick();
       }
       
-      println(getPosInSeconds());
-      println(getSliderPos());
+//      println(getPosInSeconds());
+//      println(getSliderPos());
+
+
+      /*
+      //TODO: let timeline know what ticks are before/after it's current sPos
+      for (int i = 0; i<tickArr.size()-1; i++){
+        if(spos > tickArr.get(i).getXPos()){
+          if(i < tickArr.size()-1){  //if current is less than last element in arr
+            if(spos < tickArr.get(i+1).getXPos()){  //if slider is less than next tick
+              println("between two ticks!");
+
+            }
+          }
+          else{
+            println("after last tick");
+            
+          }
+        }
+        else if(spos < tickArr.get(i).getXPos()){
+          println("before first tick");
+        }
+      }
+      */
+      int prevInd = 0;
+      int nextInd = 0;
+      prevTick = null;
+      nextTick = null;
+      prevInd = -1;
+      nextInd = 9999;
+      
+      
+      for(int i = 0; i<tickArr.size(); i++){
+        if (tickArr.get(i).getXPos() < spos){
+          prevTick = tickArr.get(i);
+          prevInd = i;
+        }
+        else{
+          break;
+        }
+      }
+      
+      for(int i = 0; i<tickArr.size(); i++){
+        if (tickArr.get(i).getXPos() > spos){
+          nextTick = tickArr.get(i);
+          nextInd = i;
+          break;
+        }
+      }
+      
+      //println(tickArr.size());
+      
+      println("prev is " + prevInd + " " + prevTick);
+
+      
+      println("next is " + nextInd + " " + nextTick);
+      
+      if(prevTick != null){
+        prevTick.changeCamColorPrev();
+      }
+      if(nextTick != null){
+        nextTick.changeCamColorNext();
+      }
+      
+      
+      
+//    println(prevTick);
     }
+  
+  
+    //todo; a smarter way of putting ticks in their prev/next objects.
+    
+
   
     public int getPosInSeconds() {
       // Convert spos to be values between
