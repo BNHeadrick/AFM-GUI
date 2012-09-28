@@ -91,11 +91,26 @@ class Tick{
     }
     
     void changeCamColorPrev(){
-      cam.changeToColor( color(100,100,100, 40));
+      //keep the same color, just change opacity
+      color c = cam.getColor();
+      
+      int r=(c>>16)&255;
+      int g=(c>>8)&255;
+      int b=c&255; 
+
+      cam.changeToColor( color(r,g,b, 40));
     }
     
     void changeCamColorNext(){
-      cam.changeToColor( color(0,255,10, 80));
+      //keep the same color, just change opacity
+      color c = cam.getColor();
+      
+      int r=(c>>16)&255;
+      int g=(c>>8)&255;
+      int b=c&255; 
+      
+      cam.changeToColor( color(r,g,b));
+      cam.setNextShapeActive();
     }
     
 }

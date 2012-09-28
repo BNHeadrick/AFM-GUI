@@ -13,6 +13,8 @@ class Cam {
   FloatBuffer modelViewMatrix = FloatBuffer.allocate(16);
   boolean isSelected;
   int boxScale = 40;
+  boolean isNext = false;
+  
 
   //testing default constructor
   Cam() { 
@@ -67,6 +69,10 @@ class Cam {
 
   void setColor(int r, int g, int b) {
     this.col = color(r, g, b);
+  }
+  
+  color getColor(){
+    return col; 
   }
   
   void display() {
@@ -125,6 +131,11 @@ class Cam {
       rotateY(radians(-2*fov));
       line(0, 0, 0, 0, 0, 1000);
     }
+    if(false){
+//      float[] matrix1 = modelViewMatrix.array();
+      fill(color(255, 0, 255));
+      ellipse(matrix[12], -matrix[14], 20, 20);
+    }
     popMatrix();
   }
 
@@ -173,6 +184,11 @@ class Cam {
   
   void changeToColor(color c){
     col = c;
+  }
+  
+  void setNextShapeActive(){
+    
+    isNext = true;
   }
   
 }
