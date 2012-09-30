@@ -32,6 +32,7 @@ public class Timeline {
   Timeline() {
     
     hs1 = new HScrollbar(hsXPos, hsYPos, hsWidth, hsHeight, looseVal);
+    
     tickArr = new ArrayList();
 
   }
@@ -80,6 +81,14 @@ public class Timeline {
     return null;
   }
   
+  void play(){
+    hs1.executePlay();
+  }
+  
+  void pause(){
+    hs1.executePause();
+  }
+  
   
   class HScrollbar {
     public int totalTime = 120;    //the total time for the timeline.
@@ -92,6 +101,8 @@ public class Timeline {
     boolean locked;
     float ratio;
     Tick prevTick, nextTick;
+    long startTime;
+    boolean isPlaying = false;
   
     HScrollbar (float xp, float yp, int sw, int sh, int l) {
       swidth = sw;
@@ -105,8 +116,6 @@ public class Timeline {
       sposMin = xpos;
       sposMax = xpos + swidth - sheight;
       loose = l;
-      
-      
     }
   
     void update() {
@@ -115,6 +124,7 @@ public class Timeline {
       } else {
         over = false;
       }
+      
       if(mousePressed && over) {
         locked = true;
       }
@@ -124,12 +134,24 @@ public class Timeline {
       if(locked) {
         newspos = constrain(mouseX-sheight/2, sposMin, sposMax);
       }
+      
       if(abs(newspos - spos) > 1) {
-        spos = spos + (newspos-spos)/loose;
+        
+        if(isPlaying){
+          long estimatedTime = System.nanoTime() - startTime;
+          
+          if(estimatedTime/1000000000 >= 1){
+            startTime = System.nanoTime();
+            spos = spos + 10;
+            println(spos);
+          }
+        
+        }
+        else{
+          spos = spos + (newspos-spos)/loose;
+        }
       }
-      
-      
-      //addTick(15);
+
     }
   
     float constrain(float val, float minv, float maxv) {
@@ -158,48 +180,16 @@ public class Timeline {
       rect(spos, ypos, sheight, sheight);
       
       for(int i = 0; i<tickArr.size(); i++){
-        //println(i);
-        //println(tickArr.get(i));
-//        displayTick(tickArr.get(i));
         tickArr.get(i).displayTick();
       }
       
-//      println(getPosInSeconds());
-//      println(getSliderPos());
-
-
-      /*
-      //TODO: let timeline know what ticks are before/after it's current sPos
-      for (int i = 0; i<tickArr.size()-1; i++){
-        if(spos > tickArr.get(i).getXPos()){
-          if(i < tickArr.size()-1){  //if current is less than last element in arr
-            if(spos < tickArr.get(i+1).getXPos()){  //if slider is less than next tick
-              println("between two ticks!");
-
-            }
-          }
-          else{
-            println("after last tick");
-            
-          }
-        }
-        else if(spos < tickArr.get(i).getXPos()){
-          println("before first tick");
-        }
-      }
-      */
-      int prevInd = 0;
-      int nextInd = 0;
       prevTick = null;
       nextTick = null;
-      prevInd = -1;
-      nextInd = 9999;
-      
       
       for(int i = 0; i<tickArr.size(); i++){
         if (tickArr.get(i).getXPos() < spos){
           prevTick = tickArr.get(i);
-          prevInd = i;
+//          prevInd = i;
         }
         else{
           break;
@@ -209,17 +199,11 @@ public class Timeline {
       for(int i = 0; i<tickArr.size(); i++){
         if (tickArr.get(i).getXPos() > spos){
           nextTick = tickArr.get(i);
-          nextInd = i;
+//          nextInd = i;
           break;
         }
       }
       
-      //println(tickArr.size());
-      
-      println("prev is " + prevInd + " " + prevTick);
-
-      
-      println("next is " + nextInd + " " + nextTick);
       
       if(prevTick != null){
         prevTick.changeCamColorPrev();
@@ -227,29 +211,30 @@ public class Timeline {
       if(nextTick != null){
         nextTick.changeCamColorNext();
       }
-      
-      
-      
-//    println(prevTick);
-    }
-  
-  
-    //todo; a smarter way of putting ticks in their prev/next objects.
-    
 
-  
+    }
     public int getPosInSeconds() {
-      // Convert spos to be values between
-      // 0 and the total width of the scrollbar
-//      return spos * ratio;
-      //scrollbar width
-      
-      //return spos;
       return (int)(((spos-50)/swidth)*totalTime);
     }
     
     public float getSliderPos(){
       return spos;
+    }
+    
+    public void executePlay(){
+      println("play");
+      
+      isPlaying = true;
+      startTime = System.nanoTime();    
+      update();
+      
+    }
+    
+    public void executePause(){
+      println("pause");
+      //long estimatedTime = System.nanoTime() - startTime;
+      //println(estimatedTime/1000000);    //convert it to milliseconds
+      isPlaying = false;
     }
     
   }
