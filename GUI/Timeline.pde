@@ -134,15 +134,16 @@ public class Timeline {
       if(locked) {
         newspos = constrain(mouseX-sheight/2, sposMin, sposMax);
       }
-      
-      if(abs(newspos - spos) > 1) {
-        
+
+      if(abs(newspos - spos) > 1 || isPlaying) {
+                
         if(isPlaying){
           long estimatedTime = System.nanoTime() - startTime;
           
           if(estimatedTime/1000000000 >= 1){
             startTime = System.nanoTime();
-            spos = spos + 10;
+            spos = spos + 30;
+//            incrementSposInSeconds();
             println(spos);
           }
         
@@ -171,12 +172,14 @@ public class Timeline {
     void display() {
       noStroke();
       fill(204);
+      //timeline
       rect(xpos, ypos, swidth, sheight);
       if(over || locked) {
         fill(0, 0, 0);
       } else {
         fill(102, 102, 102);
       }
+      //scrubber
       rect(spos, ypos, sheight, sheight);
       
       for(int i = 0; i<tickArr.size(); i++){
@@ -217,6 +220,12 @@ public class Timeline {
       return (int)(((spos-50)/swidth)*totalTime);
     }
     
+    public void incrementSposInSeconds(){
+      println(getPosInSeconds());
+      spos = ((getPosInSeconds()+1)/totalTime)*swidth+50;
+      println(getPosInSeconds());
+    }
+    
     public float getSliderPos(){
       return spos;
     }
@@ -226,7 +235,6 @@ public class Timeline {
       
       isPlaying = true;
       startTime = System.nanoTime();    
-      update();
       
     }
     
