@@ -117,13 +117,6 @@ public class Timeline {
       }
 
       if(abs(newspos - spos) > 1 || isPlaying) {
-        
-        //if playback has collided with the end of the timeline, stop playing
-        if(isPlaying){
-          if(getPosInSeconds() >= totalTime){
-            executePause();
-          }
-        }
                 
         if(isPlaying){
           long estimatedTime = System.nanoTime() - startTime;
@@ -131,9 +124,9 @@ public class Timeline {
           if(estimatedTime/1000000000 >= 1){
             //if one second has passed, make a new start time (reset the second timer)
             startTime = System.nanoTime();
-//            println("before spos is " + spos + " time is " + getPosInSeconds());
+            println("before spos is " + spos + " time is " + getPosInSeconds());
             spos = incrementSposInSeconds();
-            println("spos is " + spos + " time is " + getPosInSeconds());
+            println("after spos is " + spos + " time is " + getPosInSeconds());
           }
         
         }
@@ -230,6 +223,8 @@ public class Timeline {
     
     public void executePause(){
       println("pause");
+      //long estimatedTime = System.nanoTime() - startTime;
+      //println(estimatedTime/1000000);    //convert it to milliseconds
       isPlaying = false;
     }
     

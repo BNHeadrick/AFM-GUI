@@ -1,6 +1,7 @@
 import processing.core.*; 
 import processing.xml.*; 
 
+import controlP5.*; 
 import Jama.*; 
 import javax.media.opengl.*; 
 import processing.opengl.*; 
@@ -14,6 +15,7 @@ import Jama.*;
 import Jama.*; 
 import java.nio.FloatBuffer; 
 import Jama.*; 
+import controlP5.*; 
 import java.util.ArrayList; 
 import processing.opengl.*; 
 
@@ -51,6 +53,10 @@ public class GUI extends PApplet {
 
 
 
+
+
+
+
 ControlP5 controlP5;
 DropdownList ruleChoiceList;
 GL gl;
@@ -72,10 +78,15 @@ float globalCameraX = 0;
 float globalCameraY = 0;//-200;
 float globalCameraZ = 0;
 
+int winHeight = 720, winWidth = 1280;
+
 RulesChecker rulesChecker = new RulesChecker();
+Timeline timeline;
+
+Debug debug;
 
 public void setup() {
-  size(1280, 720, OPENGL);
+  size(winWidth, winHeight, OPENGL);
   background(bGround);
 
   controlP5 = new ControlP5(this);
@@ -127,6 +138,13 @@ public void setup() {
 
     characters.get(0).col=color(255,255,0);
     characters.get(1).col=color(255,0,255);
+    
+    timeline = new Timeline();
+    
+    debug = new Debug(controlP5);
+    
+    //title, start, end, initVal, xpos, ypos, width, height
+    //controlP5.addSlider("Timeline", 0,120,0,100,winHeight-50,winWidth-200,30);
 
 }
 
@@ -210,6 +228,7 @@ public void draw() { // display things
   rotateX(HALF_PI);
 
   controlP5.draw();
+  timeline.draw();
 }
 
 //used for debugging
@@ -303,6 +322,23 @@ public void keyPressed() {
     else
       selectedRule =0;
   }
+  if (key == 't' || key == 'T') {
+    //if a camera is active, add tick
+    for(int i =0; i<cameras.size(); i++){
+      if(cameras.get(i).camIsSelected()){
+        
+        //need to find which tick is before/after the one that would be placed here
+        //TODO above
+        timeline.addTick(cameras.get(i));
+      }
+    }
+  }
+  if (key == 'l' || key == 'L') {
+    timeline.play();
+  }
+  if (key == 'p' || key == 'P') {
+    timeline.pause();
+  }
 }
 
 /*
@@ -340,6 +376,7 @@ public void oscEvent(OscMessage theOscMessage) {
 
     println(myNewCamera);
 
+    //RAFACTOR THIS PART; MAYBE MAKE A DYNAMIC ENUM IN THE CAM DATA STRUCTURE?
     if (myNewCamera.compareTo("Camera1")==0)
       selectedCamera=0;
     if (myNewCamera.compareTo("Camera2")==0)
@@ -357,6 +394,8 @@ public void oscEvent(OscMessage theOscMessage) {
 
     cameras.get(selectedCamera).isSelected = true; 
     cameras.get(selectedCamera).changeToSelectedColor();
+//    println(""  + timeline.getTickArr());
+    timeline.getActiveTick().setCam(cameras.get(selectedCamera));
   }
 
   //Friedrich changed the AddressPattern for the submitted package - we can ignore the first string part of the message
@@ -424,6 +463,7 @@ public void controlEvent(ControlEvent theEvent) {
   else if (theEvent.isController()) {
     //    println(theEvent.controller().value()+" from "+theEvent.controller());
   }
+ 
 
 
   //  switch(theEvent.controller().id()) {
@@ -437,7 +477,14 @@ public void controlEvent(ControlEvent theEvent) {
   //    println(theEvent.controller().stringValue());
   //    break;  
   //  }
+  
 }
+
+public void slider(float theColor) {
+  //myColor = color(theColor);
+  //println("a slider event. setting background to "+theColor);
+}
+
 
 //
 
@@ -454,6 +501,8 @@ class Cam {
   FloatBuffer modelViewMatrix = FloatBuffer.allocate(16);
   boolean isSelected;
   int boxScale = 40;
+  boolean isNext = false;
+  
 
   //testing default constructor
   Cam() { 
@@ -508,6 +557,10 @@ class Cam {
 
   public void setColor(int r, int g, int b) {
     this.col = color(r, g, b);
+  }
+  
+  public int getColor(){
+    return col; 
   }
   
   public void display() {
@@ -566,6 +619,11 @@ class Cam {
       rotateY(radians(-2*fov));
       line(0, 0, 0, 0, 0, 1000);
     }
+    if(false){
+//      float[] matrix1 = modelViewMatrix.array();
+      fill(color(255, 0, 255));
+      ellipse(matrix[12], -matrix[14], 20, 20);
+    }
     popMatrix();
   }
 
@@ -607,6 +665,20 @@ class Cam {
     }
     return false;
   }
+  
+  public boolean camIsSelected(){
+    return isSelected;
+  }
+  
+  public void changeToColor(int c){
+    col = c;
+  }
+  
+  public void setNextShapeActive(){
+    
+    isNext = true;
+  }
+  
 }
 
 
@@ -722,6 +794,36 @@ class DataManager {
     }
   }
 }
+
+
+public class Debug{
+
+  ControlP5 cp5;
+  
+  Debug(){
+  }
+  
+  Debug(ControlP5 c){
+    cp5 = c;
+    
+    //cp5.addButton("addCam");
+    
+    
+  }
+  
+//  public void play(int theValue) {
+//    println("a button event from buttonB: "+theValue);
+//
+//  }
+
+  
+
+
+//tickArr.add(new Tick(150, hsYPos));
+  
+}
+
+
 
 
 
@@ -895,6 +997,356 @@ public class RulesChecker {
     }
     return new PVector(finX, 0, finY);
   }
+}
+
+class Tick{
+    
+    //tick attributes
+    float tickXPos, tickYPos, tickWidth, tickHeight;
+    final int offCol = color(40,127,80);
+    final int onCol = color(255,0,0);
+    int col;
+    boolean active;
+    Cam cam;
+    
+    //default constructor is only used for testing; do NOT use for normal use yet.
+    Tick(){
+      float r = random(50, width-100);
+      tickXPos = r;
+      tickYPos = height-(height/8);
+      tickWidth = 15;
+      tickHeight = tickWidth;
+      active = true;
+      col = onCol;
+    }
+    
+    Tick(float tXPos, float tYPos){
+      tickXPos = tXPos;
+      tickYPos = tYPos;
+      tickWidth = 15;
+      tickHeight = tickWidth;
+      col = onCol;
+    }
+    
+    Tick(float tXPos, float tYPos, Cam c){
+      this(tXPos, tYPos);
+      cam = c;
+      
+    }
+    
+    public void displayTick(){
+      fill(col);
+      ellipse(tickXPos, tickYPos, tickWidth, tickHeight);
+    }
+    
+    public float getXPos(){
+      return tickXPos;
+    }
+    public float getYPos(){
+      return tickYPos;
+    }
+    public float getWidth(){
+      return tickWidth;
+    }
+    public float getHeight(){
+      return tickHeight;
+    }
+    
+    public boolean isActive(){
+      return active;
+    }
+    
+    public void setToActive(){
+      active = true;
+      col = onCol;
+    }
+    
+    public void setToInActive(){
+      active = false;
+      col = offCol;
+    }
+    
+    public void toggleActive(){
+      active = !active;
+      if(col==onCol)
+        col=offCol;
+      else
+        col=onCol;  
+    }
+    
+    public int getCol(){
+      return col;
+    }
+    
+    public Cam getCam(){
+      return cam;
+    }
+    
+    public void setCam(Cam c){
+      cam = c;
+    }
+    
+    public void changeCamColor(){
+      cam.changeToColor( color(100,100,100));
+    }
+    
+    public void changeCamColorPrev(){
+      //keep the same color, just change opacity
+      int c = cam.getColor();
+      
+      int r=(c>>16)&255;
+      int g=(c>>8)&255;
+      int b=c&255; 
+
+      cam.changeToColor( color(r,g,b, 40));
+    }
+    
+    public void changeCamColorNext(){
+      //keep the same color, just change opacity
+      int c = cam.getColor();
+      
+      int r=(c>>16)&255;
+      int g=(c>>8)&255;
+      int b=c&255; 
+      
+      cam.changeToColor( color(r,g,b));
+      cam.setNextShapeActive();
+    }
+    
+}
+/**
+  Class that holds the timeline object and manages the scrubber and tick placements; this includes playback.
+**/
+
+//TODO: tie the camera data structure with tick management
+public class Timeline {
+  HScrollbar hs1; //scrollbar
+  
+  //scrollbar attributes
+  public int hsXPos = 50, hsYPos = height-(height/8), hsWidth=width-100, hsHeight = 25, looseVal = 1, totalTime = 120;
+  ArrayList<Tick> tickArr;
+  
+    
+  Timeline() {
+    
+    hs1 = new HScrollbar(hsXPos, hsYPos, hsWidth, hsHeight, looseVal);
+    
+    tickArr = new ArrayList();
+
+  }
+  
+  public void draw() {
+    fill(255);
+
+    hs1.update();
+
+    hs1.display();
+    
+    stroke(0);
+    line(hsXPos, hsYPos, hsWidth+hsXPos, hsYPos);
+  }
+  
+  //legacy code; don't use
+  public void addTick(float xPos){
+      tickArr.add(new Tick(xPos, hsYPos));
+  }
+  
+  public void addTick(Cam c){
+//      tickArr.add(new Tick());
+////      tickArr.get(tickArr.size()-1).setToActive();
+//      for(int i = 0; i<tickArr.size()-1; i++){
+//        tickArr.get(i).setToInActive();
+//      }
+
+    tickArr.add(new Tick(hs1.getSliderPos(), hsYPos, c));
+    //set the older ticks to inactive
+    for(int i = 0; i<tickArr.size()-1; i++){
+      tickArr.get(i).setToInActive();
+    }
+  }
+  
+  public ArrayList<Tick> getTickArr(){
+    return tickArr;
+  }
+  
+  public Tick getActiveTick(){
+    for(int i = 0; i<tickArr.size()-1; i++)
+    {
+      if(tickArr.get(i).isActive()){
+        return tickArr.get(i);
+      }
+    }
+    return null;
+  }
+  
+  public void play(){
+    hs1.executePlay();
+  }
+  
+  public void pause(){
+    hs1.executePause();
+  }
+  
+  
+  class HScrollbar {
+    int swidth, sheight;    // width and height of bar
+    float xpos, ypos;       // x and y position of bar
+    float spos, newspos;    // x position of slider
+    float sposMin, sposMax; // max and min values of slider
+    int loose;              // how loose/heavy
+    boolean over;           // is the mouse over the slider?
+    boolean locked;
+    float ratio;
+    Tick prevTick, nextTick;
+    long startTime;
+    boolean isPlaying = false;
+  
+    HScrollbar (float xp, float yp, int sw, int sh, int l) {
+      swidth = sw;
+      sheight = sh;
+      int widthtoheight = sw - sh;
+      ratio = (float)sw / (float)widthtoheight;
+      xpos = xp;
+      ypos = yp-sheight/2;
+      spos = xpos;
+      newspos = spos;
+      sposMin = xpos;
+      sposMax = xpos + swidth - sheight;
+      loose = l;
+    }
+  
+    public void update() {
+      if(overEvent()) {
+        over = true;
+      } else {
+        over = false;
+      }
+      
+      if(mousePressed && over) {
+        locked = true;
+      }
+      if(!mousePressed) {
+        locked = false;
+      }
+      if(locked) {
+        newspos = constrain(mouseX-sheight/2, sposMin, sposMax);
+      }
+
+      if(abs(newspos - spos) > 1 || isPlaying) {
+                
+        if(isPlaying){
+          long estimatedTime = System.nanoTime() - startTime;
+          
+          if(estimatedTime/1000000000 >= 1){
+            //if one second has passed, make a new start time (reset the second timer)
+            startTime = System.nanoTime();
+            println("before spos is " + spos + " time is " + getPosInSeconds());
+            spos = incrementSposInSeconds();
+            println("after spos is " + spos + " time is " + getPosInSeconds());
+          }
+        
+        }
+        else{
+          spos = spos + (newspos-spos)/loose;
+        }
+      }
+//      println(getPosInSeconds());
+
+    }
+  
+    public float constrain(float val, float minv, float maxv) {
+      return min(max(val, minv), maxv);
+    }
+  
+    public boolean overEvent() {
+      if(mouseX > xpos && mouseX < xpos+swidth &&
+         mouseY > ypos && mouseY < ypos+sheight) {
+        return true;
+      } else {
+        return false;
+      }
+    }
+  
+    //displays the timeline box and the ticks.
+    public void display() {
+      noStroke();
+      fill(204);
+      //timeline
+      rect(xpos, ypos, swidth, sheight);
+      if(over || locked) {
+        fill(0, 0, 0);
+      } else {
+        fill(102, 102, 102);
+      }
+      //scrubber
+      rect(spos, ypos, sheight, sheight);
+      
+      for(int i = 0; i<tickArr.size(); i++){
+        tickArr.get(i).displayTick();
+      }
+      
+      prevTick = null;
+      nextTick = null;
+      
+      for(int i = 0; i<tickArr.size(); i++){
+        if (tickArr.get(i).getXPos() < spos){
+          prevTick = tickArr.get(i);
+        }
+        else{
+          break;
+        }
+      }
+      
+      for(int i = 0; i<tickArr.size(); i++){
+        if (tickArr.get(i).getXPos() > spos){
+          nextTick = tickArr.get(i);
+          break;
+        }
+      }
+      
+      
+      if(prevTick != null){
+        prevTick.changeCamColorPrev();
+      }
+      if(nextTick != null){
+        nextTick.changeCamColorNext();
+      }
+
+    }
+    public int getPosInSeconds() {
+      return (int)(((spos-50)/swidth)*totalTime);
+    }
+    
+    public int incrementSposInSeconds(){
+//      println(getPosInSeconds());
+//      println("posInSec " + getPosInSeconds() + " swidth+50 " + (swidth+50) + " " + (1/totalTime) + " " + (1.0/totalTime)*swidth*50);
+
+      return (int)(((((float)getPosInSeconds()+ 1.5f)/(totalTime))*swidth)+50);
+      
+    }
+    
+    public float getSliderPos(){
+      return spos;
+    }
+    
+    public void executePlay(){
+      println("play");
+      
+      isPlaying = true;
+      startTime = System.nanoTime();    
+      
+    }
+    
+    public void executePause(){
+      println("pause");
+      //long estimatedTime = System.nanoTime() - startTime;
+      //println(estimatedTime/1000000);    //convert it to milliseconds
+      isPlaying = false;
+    }
+    
+  }
+  
+  
 }
   static public void main(String args[]) {
     PApplet.main(new String[] { "--bgcolor=#FFFFFF", "GUI" });

@@ -1,3 +1,7 @@
+
+
+import controlP5.*;
+
 import Jama.*;
 import javax.media.opengl.*;
 import processing.opengl.*;
@@ -28,10 +32,15 @@ float globalCameraX = 0;
 float globalCameraY = 0;//-200;
 float globalCameraZ = 0;
 
+int winHeight = 720, winWidth = 1280;
+
 RulesChecker rulesChecker = new RulesChecker();
+Timeline timeline;
+
+Debug debug;
 
 void setup() {
-  size(1280, 720, OPENGL);
+  size(winWidth, winHeight, OPENGL);
   background(bGround);
 
   controlP5 = new ControlP5(this);
@@ -83,6 +92,13 @@ void setup() {
 
     characters.get(0).col=color(255,255,0);
     characters.get(1).col=color(255,0,255);
+    
+    timeline = new Timeline();
+    
+    debug = new Debug(controlP5);
+    
+    //title, start, end, initVal, xpos, ypos, width, height
+    //controlP5.addSlider("Timeline", 0,120,0,100,winHeight-50,winWidth-200,30);
 
 }
 
@@ -166,6 +182,7 @@ void draw() { // display things
   rotateX(HALF_PI);
 
   controlP5.draw();
+  timeline.draw();
 }
 
 //used for debugging
@@ -259,6 +276,23 @@ void keyPressed() {
     else
       selectedRule =0;
   }
+  if (key == 't' || key == 'T') {
+    //if a camera is active, add tick
+    for(int i =0; i<cameras.size(); i++){
+      if(cameras.get(i).camIsSelected()){
+        
+        //need to find which tick is before/after the one that would be placed here
+        //TODO above
+        timeline.addTick(cameras.get(i));
+      }
+    }
+  }
+  if (key == 'l' || key == 'L') {
+    timeline.play();
+  }
+  if (key == 'p' || key == 'P') {
+    timeline.pause();
+  }
 }
 
 /*
@@ -296,6 +330,7 @@ void oscEvent(OscMessage theOscMessage) {
 
     println(myNewCamera);
 
+    //RAFACTOR THIS PART; MAYBE MAKE A DYNAMIC ENUM IN THE CAM DATA STRUCTURE?
     if (myNewCamera.compareTo("Camera1")==0)
       selectedCamera=0;
     if (myNewCamera.compareTo("Camera2")==0)
@@ -313,6 +348,8 @@ void oscEvent(OscMessage theOscMessage) {
 
     cameras.get(selectedCamera).isSelected = true; 
     cameras.get(selectedCamera).changeToSelectedColor();
+//    println(""  + timeline.getTickArr());
+    timeline.getActiveTick().setCam(cameras.get(selectedCamera));
   }
 
   //Friedrich changed the AddressPattern for the submitted package - we can ignore the first string part of the message
@@ -380,6 +417,7 @@ void controlEvent(ControlEvent theEvent) {
   else if (theEvent.isController()) {
     //    println(theEvent.controller().value()+" from "+theEvent.controller());
   }
+ 
 
 
   //  switch(theEvent.controller().id()) {
@@ -393,5 +431,12 @@ void controlEvent(ControlEvent theEvent) {
   //    println(theEvent.controller().stringValue());
   //    break;  
   //  }
+  
 }
+
+void slider(float theColor) {
+  //myColor = color(theColor);
+  //println("a slider event. setting background to "+theColor);
+}
+
 
