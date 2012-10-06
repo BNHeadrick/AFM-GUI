@@ -68,7 +68,9 @@ public class Timeline {
   }
   
   void pause(){
+    println(hs1.getSliderPos());
     hs1.executePause();
+    println(hs1.getSliderPos());
   }
   
   
@@ -170,6 +172,7 @@ public class Timeline {
         fill(102, 102, 102);
       }
       //scrubber
+      //println(spos);
       rect(spos, ypos, sheight, sheight);
       
       for(int i = 0; i<tickArr.size(); i++){
@@ -219,6 +222,9 @@ public class Timeline {
     public float getSliderPos(){
       return spos;
     }
+    public void setSpos(float s){
+      spos = s;
+    }
     
     public void executePlay(){
       println("play");
@@ -231,6 +237,7 @@ public class Timeline {
     public void executePause(){
       println("pause");
       isPlaying = false;
+      
     }
     
   }

@@ -104,6 +104,7 @@ void setup() {
 
 void draw() { // display things
 
+  //execute sceneManager stuff
   resetMatrix();
   //beginCamera();
   camera();
@@ -183,6 +184,7 @@ void draw() { // display things
 
   controlP5.draw();
   timeline.draw();
+  
 }
 
 //used for debugging
