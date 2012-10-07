@@ -1,3 +1,6 @@
+/**
+A tick is an event on a timeline that specifically represents a change in the selected camera for that specific time.
+**/
 
 class Tick{
     

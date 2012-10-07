@@ -5,17 +5,21 @@
 //TODO: tie the camera data structure with tick management
 public class Timeline {
   HScrollbar hs1; //scrollbar
+  SceneManager sMan;
   
   //scrollbar attributes
   public int hsXPos = 50, hsYPos = height-(height/8), hsWidth=width-100, hsHeight = 25, looseVal = 1, totalTime = 120;
   ArrayList<Tick> tickArr;
+//  ArrayList<Event> eventArr;
   
     
   Timeline() {
     
     hs1 = new HScrollbar(hsXPos, hsYPos, hsWidth, hsHeight, looseVal);
+    sMan = new SceneManager();
     
     tickArr = new ArrayList();
+//    eventArr = new ArrayList();  //TODO; EVERYTHING WITH EVENTS!
 
   }
   
@@ -36,12 +40,6 @@ public class Timeline {
   }
   
   void addTick(Cam c){
-//      tickArr.add(new Tick());
-////      tickArr.get(tickArr.size()-1).setToActive();
-//      for(int i = 0; i<tickArr.size()-1; i++){
-//        tickArr.get(i).setToInActive();
-//      }
-
     tickArr.add(new Tick(hs1.getSliderPos(), hsYPos, c));
     //set the older ticks to inactive
     for(int i = 0; i<tickArr.size()-1; i++){
@@ -102,7 +100,10 @@ public class Timeline {
     }
   
     void update() {
-      if(overEvent()) {
+      
+      if(sMan.eventHappened(getPosInSeconds())) println("yay");
+      
+      if(overSlide()) {
         over = true;
       } else {
         over = false;
@@ -151,7 +152,7 @@ public class Timeline {
       return min(max(val, minv), maxv);
     }
   
-    boolean overEvent() {
+    boolean overSlide() {
       if(mouseX > xpos && mouseX < xpos+swidth &&
          mouseY > ypos && mouseY < ypos+sheight) {
         return true;
