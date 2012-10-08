@@ -101,7 +101,10 @@ public class Timeline {
   
     void update() {
       
-      if(sMan.eventHappened(getPosInSeconds())) println("yay");
+      
+      if(sMan.eventHappened(getPosInSeconds())){
+        println(sMan.popEvent());
+      }
       
       if(overSlide()) {
         over = true;
@@ -143,6 +146,10 @@ public class Timeline {
         else{
           spos = spos + (newspos-spos)/loose;
         }
+      }
+      //if the timeline is NOT playing, create the queue for the events to unfold in order
+      if(!isPlaying){
+        sMan.createQueue(getPosInSeconds()); 
       }
 //      println(getPosInSeconds());
 
@@ -238,7 +245,8 @@ public class Timeline {
     public void executePause(){
       println("pause");
       isPlaying = false;
-      
+    
+       
     }
     
   }

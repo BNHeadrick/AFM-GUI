@@ -1,15 +1,15 @@
-public class CamPos extends Event{
+public class CharPos extends Event{
   
   int xPos;
   int yPos;
   
-  public CamPos(int x, int y, int time){
+  public CharPos(int x, int y, int time){
     xPos = x;
     yPos = y;
     timeStamp = time;
   }
   
   public String toString(){
-    return "CamPos";
+    return "CharPos";
   }
 }
