@@ -13,10 +13,10 @@ public class Timeline {
 //  ArrayList<Event> eventArr;
   
     
-  Timeline() {
+  Timeline(SceneManager sManager) {
     
     hs1 = new HScrollbar(hsXPos, hsYPos, hsWidth, hsHeight, looseVal);
-    sMan = new SceneManager();
+    sMan = sManager;
     
     tickArr = new ArrayList();
 //    eventArr = new ArrayList();  //TODO; EVERYTHING WITH EVENTS!

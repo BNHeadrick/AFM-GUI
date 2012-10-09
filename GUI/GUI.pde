@@ -42,6 +42,7 @@ Debug debug;
 void setup() {
   size(winWidth, winHeight, OPENGL);
   background(bGround);
+  SceneManager sm = new SceneManager();
 
   controlP5 = new ControlP5(this);
   //ruleChoiceList = controlP5.addDropdownList("ruleChoiceList",850,100,100,100);
@@ -93,7 +94,7 @@ void setup() {
     characters.get(0).col=color(255,255,0);
     characters.get(1).col=color(255,0,255);
     
-    timeline = new Timeline();
+    timeline = new Timeline(sm);
     
     debug = new Debug(controlP5);
     

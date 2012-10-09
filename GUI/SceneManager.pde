@@ -1,3 +1,17 @@
+/**
+
+here's the input file stuff:
+
+0.7f 0.0f 0.7f 0.0f 0.0f 1.0f 0.0f 0.0f 0.7f 0.0f -0.7f 0.0f 100.0f 000.0f -100.0f 1f
+1.0f 0.0f 0.0f 0.0f 0.0f 1.0f 0.0f 0.0f 0.0f 0.0f 1.0f 0.0f 450.0f 000.0f -550.0f 1f
+-0.7f 0.0f 0.7f 0.0f 0.0f 1.0f 0.0f 0.0f 0.7f 0.0f 0.7f 0.0f 100.0f 000.0f -550.0f 1f
+1.0f 0.0f 0.0f 0.0f 0.0f 1.0f 0.0f 0.0f 0.0f 0.0f -1.0f 0.0f 450.0f 000.0f -100.0f 1f
+
+I need to put this information into 
+
+**/
+
+
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.ListIterator;
@@ -6,11 +20,6 @@ import java.util.Queue;
 //this class reads in a file that contains scene information, including camera positions, character positions, and dialog timestamps.
 public class SceneManager implements Constants {
   
-//  LinkedList<Event> camPosList, dialogTimeList, charPosList;  //hold the permanent info
-//  Queue<Event> camPosQue, dialogTimeQue, charPosQue;          //queues for execution on timeline
-
-//that was silly; just get one event queue full of events of either campos, dialogtime, or charpos type.
-
   LinkedList<Event> eventList;
   Queue<Event> eventQueue;
   Iterator<Event> queueIt;
