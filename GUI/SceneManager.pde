@@ -84,4 +84,8 @@ public class SceneManager implements Constants {
     return eventQueue.poll();
   }
   
+  public LinkedList<Event> getEventList(){
+    return eventList; 
+  }
+  
 }

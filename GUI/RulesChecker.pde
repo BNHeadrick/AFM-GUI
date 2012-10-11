@@ -1,7 +1,7 @@
 import java.util.ArrayList;
 import processing.opengl.*;
 
-public class RulesChecker {
+public class RulesChecker implements Constants{
   public void checkLineOfAction(ArrayList<Cam> cameras, ArrayList<Character> characters, int selectedIdx) {
     if (cameras == null || cameras.isEmpty()) {
       println("No cameras in the scene!");
@@ -170,5 +170,27 @@ public class RulesChecker {
       }    
     }
     return new PVector(finX, 0, finY);
+  }
+  
+  public void checkCuttingOnAction(SceneManager sm, Timeline tl){
+    LinkedList<Event> eList = sm.getEventList();
+    ArrayList<Tick> tArr = tl.getTickArr();
+    ListIterator<Event> listIt;
+  
+    for(int i = 0; i<tArr.size(); i++){
+//      println("here");
+      listIt = eList.listIterator();
+      while(listIt.hasNext()){
+        Event tempEvent = listIt.next();
+        //check for time colisions.
+//        println("event " + tempEvent.getTimeStamp() + " tick time " + tArr.get(i).getTimeStamp() + " " + tempEvent.type);
+        
+        if((tempEvent.getType()==DIA_TIME) && (tempEvent.getTimeStamp()==tArr.get(i).getTimeStamp())){
+          println("CUTTING ON ACTION ERROR!");
+        }
+        
+      }
+    }
+
   }
 }

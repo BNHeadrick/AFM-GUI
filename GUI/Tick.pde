@@ -11,6 +11,7 @@ class Tick{
     color col;
     boolean active;
     Cam cam;
+    int time;
     
     //default constructor is only used for testing; do NOT use for normal use yet.
     Tick(){
@@ -31,10 +32,10 @@ class Tick{
       col = onCol;
     }
     
-    Tick(float tXPos, float tYPos, Cam c){
+    Tick(float tXPos, float tYPos, Cam c, int t){
       this(tXPos, tYPos);
       cam = c;
-      
+      time = t;
     }
     
     void displayTick(){
@@ -114,6 +115,10 @@ class Tick{
       
       cam.changeToColor( color(r,g,b));
       cam.setNextShapeActive();
+    }
+    
+    int getTimeStamp(){
+      return time;
     }
     
 }

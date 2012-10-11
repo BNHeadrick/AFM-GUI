@@ -34,15 +34,17 @@ float globalCameraZ = 0;
 
 int winHeight = 720, winWidth = 1280;
 
-RulesChecker rulesChecker = new RulesChecker();
+RulesChecker rulesChecker;
 Timeline timeline;
+SceneManager sm;
 
 Debug debug;
 
 void setup() {
   size(winWidth, winHeight, OPENGL);
   background(bGround);
-  SceneManager sm = new SceneManager();
+  sm = new SceneManager();
+  rulesChecker = new RulesChecker();
 
   controlP5 = new ControlP5(this);
   //ruleChoiceList = controlP5.addDropdownList("ruleChoiceList",850,100,100,100);
@@ -168,6 +170,8 @@ void draw() { // display things
         resetAllCams();
     }
   }
+  
+  rulesChecker.checkCuttingOnAction(sm, timeline);
 
   /* This is for camera rotation using a and d
    resetMatrix();

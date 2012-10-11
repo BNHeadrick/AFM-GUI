@@ -3,8 +3,9 @@ An Event is something that occurs on the timeline that is not observable from th
 the scene manager, and include character movement times, dialogues, and camera positions.
 **/
 
-public class Event{
+public class Event implements Constants{
   int timeStamp;
+  int type;
   
   public Event(){
   }
@@ -17,6 +18,9 @@ public class Event{
     return timeStamp; 
   }
   
+  public int getType(){
+    return type; 
+  }
 
   
 }

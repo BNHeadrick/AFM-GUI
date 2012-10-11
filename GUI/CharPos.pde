@@ -7,6 +7,7 @@ public class CharPos extends Event{
     xPos = x;
     yPos = y;
     timeStamp = time;
+    type = CHAR_POS;
   }
   
   public String toString(){

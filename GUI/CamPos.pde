@@ -7,6 +7,7 @@ public class CamPos extends Event{
     xPos = x;
     yPos = y;
     timeStamp = time;
+    type = CAM_POS;
   }
   
   public String toString(){

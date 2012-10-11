@@ -40,7 +40,7 @@ public class Timeline {
   }
   
   void addTick(Cam c){
-    tickArr.add(new Tick(hs1.getSliderPos(), hsYPos, c));
+    tickArr.add(new Tick(hs1.getSliderPos(), hsYPos, c, hs1.getPosInSeconds()));
     //set the older ticks to inactive
     for(int i = 0; i<tickArr.size()-1; i++){
       tickArr.get(i).setToInActive();
