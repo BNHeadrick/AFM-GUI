@@ -172,6 +172,7 @@ void draw() { // display things
   }
   
   rulesChecker.checkCuttingOnAction(sm, timeline);
+  rulesChecker.checkPacing(sm, timeline);
 
   /* This is for camera rotation using a and d
    resetMatrix();

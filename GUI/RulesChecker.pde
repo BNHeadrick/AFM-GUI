@@ -193,4 +193,20 @@ public class RulesChecker implements Constants{
     }
 
   }
+  
+  public void checkPacing(SceneManager sm, Timeline tl){
+    ArrayList<Tick> tArr = tl.getTickArr();
+    int[] timeArr= new int[tArr.size()]; 
+    for(int i = 0; i<tArr.size(); i++){
+      timeArr[i] = tArr.get(i).getTimeStamp();
+    }
+    
+    if(timeArr.length>1){
+     
+      for(int i = 1; i<timeArr.length; i++){
+        
+      }
+    }
+    
+  }
 }
