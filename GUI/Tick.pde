@@ -7,11 +7,13 @@ class Tick{
     //tick attributes
     float tickXPos, tickYPos, tickWidth, tickHeight;
     final color offCol = color(40,127,80);
-    final color onCol = color(255,0,0);
+    final color errorCol = color(255,0,0);
+    final color onCol = offCol;
     color col;
     boolean active;
     Cam cam;
     int time;
+    boolean pacingViolation;
     
     //default constructor is only used for testing; do NOT use for normal use yet.
     Tick(){
@@ -22,6 +24,7 @@ class Tick{
       tickHeight = tickWidth;
       active = true;
       col = onCol;
+      pacingViolation = false;
     }
     
     Tick(float tXPos, float tYPos){
@@ -119,6 +122,16 @@ class Tick{
     
     int getTimeStamp(){
       return time;
+    }
+    
+    public void setPacingViolation(boolean b){
+      pacingViolation = b;
+      if(!b){ col = offCol;}
+      else{col = errorCol;}
+    }
+    
+    public boolean getPacingViolation(){
+      return pacingViolation;
     }
     
 }

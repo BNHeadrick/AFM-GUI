@@ -97,6 +97,8 @@ void setup() {
     characters.get(1).col=color(255,0,255);
     
     timeline = new Timeline(sm);
+    //add initial tick to the begining of the timeline
+    timeline.addTick(cameras.get(0));
     
     debug = new Debug(controlP5);
     

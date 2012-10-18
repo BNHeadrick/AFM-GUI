@@ -196,19 +196,34 @@ public class RulesChecker implements Constants{
   
   public void checkPacing(SceneManager sm, Timeline tl){
     ArrayList<Tick> tArr = tl.getTickArr();
-    int[] timeArr= new int[tArr.size()]; 
+    int[] delTimeArr= new int[tArr.size()-1]; 
     
     int total = 0;
 //    int count = 0;
     if(tArr.size()>1){
       for(int i = 1; i<tArr.size(); i++){
-        //timeArr[i] = tArr.get(i).getTimeStamp();
-        total = total + tArr.get(i).getTimeStamp()-tArr.get(i-1).getTimeStamp();
+        delTimeArr[i-1] = tArr.get(i).getTimeStamp()-tArr.get(i-1).getTimeStamp();
+        total = total + delTimeArr[i-1];
       }
       
       println("current sscrubber is at time " + tl.getScrollbarTimeInSecs() );
       println("totalTime is " + total);
-      println("totalAverage is " + (total/(tArr.size()-1)));
+      
+      int average = total/(tArr.size()-1);
+      println("totalAverage is " + average);
+      
+      //compare the average to the actual distribution of tick events
+      for(int i = 0; i<delTimeArr.length; i++){
+        if(!(delTimeArr[i] < (average+20) && delTimeArr[i] > (average-20)) || delTimeArr[i]<3){
+          tArr.get(i+1).setPacingViolation(true);
+        }
+        else{
+          if(tArr.get(i+1).getPacingViolation()){
+            tArr.get(i+1).setPacingViolation(false);
+          }
+        }
+      }
+      
     }
     
   }
