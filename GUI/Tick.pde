@@ -2,7 +2,7 @@
 A tick is an event on a timeline that specifically represents a change in the selected camera for that specific time.
 **/
 
-class Tick{
+class Tick implements Comparable{
     
     //tick attributes
     float tickXPos, tickYPos, tickWidth, tickHeight;
@@ -132,6 +132,25 @@ class Tick{
     
     public boolean getPacingViolation(){
       return pacingViolation;
+    }
+    
+    public int compareTo(Object otherTick){
+      if(!(otherTick instanceof Tick)){
+        throw new ClassCastException("Not a valid Tick object!");
+      }
+      
+      Tick tempTick = (Tick)otherTick;
+      
+      if(this.getTimeStamp() > tempTick.getTimeStamp()){
+        return 1;
+      }
+      else if(this.getTimeStamp() < tempTick.getTimeStamp()){
+        return -1;
+      }
+      else{
+        return 0;
+      }
+
     }
     
 }

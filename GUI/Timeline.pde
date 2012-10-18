@@ -1,7 +1,7 @@
 /**
   Class that holds the timeline object and manages the scrubber and tick placements; this includes playback.
 **/
-
+import java.util.Collections;
 //TODO: tie the camera data structure with tick management
 public class Timeline {
   HScrollbar hs1; //scrollbar
@@ -45,6 +45,8 @@ public class Timeline {
     for(int i = 0; i<tickArr.size()-1; i++){
       tickArr.get(i).setToInActive();
     }
+    //sort the ticks in case one was placed before an existing tick
+    Collections.sort(tickArr);
   }
   
   ArrayList<Tick> getTickArr(){
