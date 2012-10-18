@@ -71,6 +71,10 @@ public class Timeline {
     println(hs1.getSliderPos());
   }
   
+  public int getScrollbarTimeInSecs(){
+    return hs1.getPosInSeconds();
+  }
+  
   
   class HScrollbar {
     int swidth, sheight;    // width and height of bar
