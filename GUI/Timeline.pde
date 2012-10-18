@@ -88,8 +88,10 @@ public class Timeline {
     Tick prevTick, nextTick;
     long startTime;
     boolean isPlaying = false;
+    int displacement = 0;
   
     HScrollbar (float xp, float yp, int sw, int sh, int l) {
+      
       swidth = sw;
       sheight = sh;
       int widthtoheight = sw - sh;
@@ -185,7 +187,7 @@ public class Timeline {
       }
       //scrubber
       //println(spos);
-      rect(spos, ypos, sheight, sheight);
+      rect(spos-sheight/2, ypos, sheight, sheight);
       
       for(int i = 0; i<tickArr.size(); i++){
         tickArr.get(i).displayTick();
