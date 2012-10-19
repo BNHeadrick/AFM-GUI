@@ -40,6 +40,9 @@ SceneManager sm;
 
 Debug debug;
 
+// current frame of the scene - set by KinectFingerTracker
+int currentFrame;
+
 void setup() {
   size(winWidth, winHeight, OPENGL);
   background(bGround);
@@ -335,7 +338,7 @@ void oscEvent(OscMessage theOscMessage) {
 
   //Friedrich added this select camera event
   if (theOscMessage != null && theOscMessage.checkAddrPattern("/selectActorByName")) {
-    println("yay!");
+    println("select Actor!");
     String myNewCamera=theOscMessage.get(0).stringValue();
 
     println(myNewCamera);
@@ -392,6 +395,14 @@ void oscEvent(OscMessage theOscMessage) {
     // Change this variable based on the data received from OSC
     //    int selectedCamera = 5;
     cameras.get(selectedCamera).modelViewMatrix = fb;
+  }
+  
+  // receive the currentFrame from kinect
+  // this is where the playhead is on the timeline
+  // currentFrame is global
+   if (theOscMessage != null && theOscMessage.checkAddrPattern("/setPlayheadFrame/int")) {
+   currentFrame = theOscMessage.get(0).intValue();
+    println("Current Frame: " + currentFrame);
   }
 }
 
