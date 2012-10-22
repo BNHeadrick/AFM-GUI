@@ -14,6 +14,7 @@ class Tick implements Comparable{
     Cam cam;
     int time;
     boolean pacingViolation;
+    boolean cutViolation;
     
     //default constructor is only used for testing; do NOT use for normal use yet.
     Tick(){
@@ -25,6 +26,7 @@ class Tick implements Comparable{
       active = true;
       col = onCol;
       pacingViolation = false;
+      cutViolation = false;
     }
     
     Tick(float tXPos, float tYPos){
@@ -132,6 +134,16 @@ class Tick implements Comparable{
     
     public boolean getPacingViolation(){
       return pacingViolation;
+    }
+    
+    public void setCutViolation(boolean b){
+      cutViolation = b;
+      if(!b){ col = offCol;}
+      else{col = errorCol;}
+    }
+    
+    public boolean getCutViolation(){
+      return cutViolation;
     }
     
     public int compareTo(Object otherTick){

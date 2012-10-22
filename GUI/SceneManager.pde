@@ -43,6 +43,7 @@ public class SceneManager implements Constants {
     eventList = new LinkedList<Event>();
     eventList.add(new CamPos(10,10,2));
     eventList.add(new Dialog(null, 3));
+    eventList.add(new Dialog(null, 50));
     eventList.add(new CharPos(50,50,4));
     eventList.add(new CharPos(50,50,5));
     

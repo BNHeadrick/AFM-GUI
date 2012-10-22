@@ -187,6 +187,10 @@ public class RulesChecker implements Constants{
         
         if((tempEvent.getType()==DIA_TIME) && (tempEvent.getTimeStamp()==tArr.get(i).getTimeStamp())){
           println("CUTTING ON ACTION ERROR!");
+          tArr.get(i).setCutViolation(true);
+        }
+        else{
+          tArr.get(i).setCutViolation(false);
         }
         
       }
