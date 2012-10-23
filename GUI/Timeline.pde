@@ -6,16 +6,18 @@ import java.util.Collections;
 public class Timeline {
   HScrollbar hs1; //scrollbar
   SceneManager sMan;
+  int curFrame;
   
   //scrollbar attributes
-  public int hsXPos = 50, hsYPos = height-(height/8), hsWidth=width-100, hsHeight = 25, looseVal = 1, totalTime = 120;
+  public int hsXPos = 50, hsYPos = height-(height/8), hsWidth=width-100, 
+  hsHeight = 25, looseVal = 1, totalTime = 120, fps = 30, disp = 50;
   ArrayList<Tick> tickArr;
 //  ArrayList<Event> eventArr;
   
     
   Timeline(SceneManager sManager) {
     
-    hs1 = new HScrollbar(hsXPos, hsYPos, hsWidth, hsHeight, looseVal);
+    hs1 = new HScrollbar(hsXPos, hsYPos, hsWidth, hsHeight, looseVal, disp);
     sMan = sManager;
     
     tickArr = new ArrayList();
@@ -67,6 +69,11 @@ public class Timeline {
     hs1.executePlay();
   }
   
+  //used or scrubbing
+  void setFrame(int frameNum){
+    hs1.setSposWithFrame(frameNum);
+  }
+  
   void pause(){
     println(hs1.getSliderPos());
     hs1.executePause();
@@ -92,8 +99,8 @@ public class Timeline {
     boolean isPlaying = false;
     int displacement = 0;
   
-    HScrollbar (float xp, float yp, int sw, int sh, int l) {
-      
+    HScrollbar (float xp, float yp, int sw, int sh, int l, int dis) {
+      displacement = dis;
       swidth = sw;
       sheight = sh;
       int widthtoheight = sw - sh;
@@ -147,7 +154,7 @@ public class Timeline {
             startTime = System.nanoTime();
 //            println("before spos is " + spos + " time is " + getPosInSeconds());
             spos = incrementSposInSeconds();
-            println("spos is " + spos + " time is " + getPosInSeconds());
+            println("spos is " + spos + " time is " + getPosInSeconds() + " frame is " + getPosInFrames());
           }
         
         }
@@ -223,15 +230,30 @@ public class Timeline {
       }
 
     }
-    public int getPosInSeconds() {
-      return (int)(((spos-50)/swidth)*totalTime);
+    
+    //todo; this
+    private int incrementSposInFrames(){
+      return 0;
     }
     
-    public int incrementSposInSeconds(){
+    public void setSposWithFrame(int frameNum){
+      spos = fps*frameNum+displacement;
+    }
+    
+    public int getPosInFrames(){
+      return (int)(((spos-displacement)/swidth)*(totalTime))*fps;
+    }
+    
+    public int getPosInSeconds() {
+      return (int)(((spos-displacement)/swidth)*totalTime);
+    }
+    
+    //EVENTUALLY REMOVE THIS FUNCTION; need to rely on incrementFrame instead
+    private int incrementSposInSeconds(){
 //      println(getPosInSeconds());
 //      println("posInSec " + getPosInSeconds() + " swidth+50 " + (swidth+50) + " " + (1/totalTime) + " " + (1.0/totalTime)*swidth*50);
 
-      return (int)(((((float)getPosInSeconds()+ 1.5)/(totalTime))*swidth)+50);
+      return (int)(((((float)getPosInSeconds()+ 1.5)/(totalTime))*swidth)+displacement);
       
     }
     
