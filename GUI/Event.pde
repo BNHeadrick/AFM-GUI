@@ -21,6 +21,10 @@ public class Event implements Constants{
   public int getType(){
     return type; 
   }
+  
+  public void execute(int time){
+    
+  }
 
   
 }

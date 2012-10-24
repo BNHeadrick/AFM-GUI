@@ -26,7 +26,7 @@ public class SceneManager implements Constants {
   ListIterator<Event> listIt;
   
   //debug one; eventually read from a JSON or XML file
-  public SceneManager(){
+  public SceneManager(Minim m){
     
 //    camPosList = new LinkedList<Event>();
 //    charPosList = new LinkedList<Event>();
@@ -34,16 +34,29 @@ public class SceneManager implements Constants {
     
     //TODO; read from input file and populate the List objects;
     //for now, just use addJunk; later use populateList() instead
-    addJunk();
+    addJunkWithAudio(m);
+//    addJunk();
     //createQueue(0);
 
   }
   
+  //LEGACY DON'T USE!
   public void addJunk(){
+//    eventList = new LinkedList<Event>();
+//    eventList.add(new CamPos(10,10,2));
+//    eventList.add(new Dialog(null, 3));
+//    eventList.add(new Dialog("groove.mp3", 50));
+//    eventList.add(new CharPos(50,50,4));
+//    eventList.add(new CharPos(50,50,5));
+//    
+//    createQueue(0);
+    
+  }
+  public void addJunkWithAudio(Minim mn){
     eventList = new LinkedList<Event>();
     eventList.add(new CamPos(10,10,2));
-    eventList.add(new Dialog(null, 3));
-    eventList.add(new Dialog(null, 50));
+//    eventList.add(new Dialog(null, 3, mn));
+    eventList.add(new Dialog("groove.mp3", 2, mn));
     eventList.add(new CharPos(50,50,4));
     eventList.add(new CharPos(50,50,5));
     

@@ -1,24 +1,30 @@
 /**
   Class that holds the timeline object and manages the scrubber and tick placements; this includes playback.
 **/
-import java.util.Collections;
+
 //TODO: tie the camera data structure with tick management
+
+
 public class Timeline {
   HScrollbar hs1; //scrollbar
   SceneManager sMan;
   int curFrame;
+  //audio object
+  
   
   //scrollbar attributes
   public int hsXPos = 50, hsYPos = height-(height/8), hsWidth=width-100, 
   hsHeight = 25, looseVal = 1, totalTime = 120, fps = 30, disp = 50;
+  
   ArrayList<Tick> tickArr;
 //  ArrayList<Event> eventArr;
   
     
   Timeline(SceneManager sManager) {
-    
+
     hs1 = new HScrollbar(hsXPos, hsYPos, hsWidth, hsHeight, looseVal, disp);
     sMan = sManager;
+    
     
     tickArr = new ArrayList();
 //    eventArr = new ArrayList();  //TODO; EVERYTHING WITH EVENTS!
@@ -118,6 +124,8 @@ public class Timeline {
       
       
       if(sMan.eventHappened(getPosInSeconds())){
+        //put sound code here!!!
+        sMan.peekNextEvent().execute(getPosInSeconds());
         println(sMan.popEvent());
       }
       
@@ -275,7 +283,7 @@ public class Timeline {
     public void executePause(){
       println("pause");
       isPlaying = false;
-    
+      
        
     }
     

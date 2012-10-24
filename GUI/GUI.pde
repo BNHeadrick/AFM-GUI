@@ -1,4 +1,7 @@
-
+import ddf.minim.*;
+import ddf.minim.signals.*;
+import ddf.minim.analysis.*;
+import ddf.minim.effects.*;
 
 import controlP5.*;
 
@@ -39,14 +42,17 @@ Timeline timeline;
 SceneManager sm;
 
 Debug debug;
+Minim minim;
+
 
 // current frame of the scene - set by KinectFingerTracker
 int currentFrame;
 
 void setup() {
+  minim = new Minim(this);
   size(winWidth, winHeight, OPENGL);
   background(bGround);
-  sm = new SceneManager();
+  sm = new SceneManager(minim);
   rulesChecker = new RulesChecker();
 
   controlP5 = new ControlP5(this);
