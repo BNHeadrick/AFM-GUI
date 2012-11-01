@@ -7,7 +7,11 @@ here's the input file stuff:
 -0.7f 0.0f 0.7f 0.0f 0.0f 1.0f 0.0f 0.0f 0.7f 0.0f 0.7f 0.0f 100.0f 000.0f -550.0f 1f
 1.0f 0.0f 0.0f 0.0f 0.0f 1.0f 0.0f 0.0f 0.0f 0.0f -1.0f 0.0f 450.0f 000.0f -100.0f 1f
 
-I need to put this information into 
+I need to put this information into a json thingie
+
+char info: 
+1.0f 0.0f 0.0f 0.0f 0.0f 1.0f 0.0f 0.0f 0.0f 0.0f 1.0f 0.0f 240.0f 000.0f -350.0f 1f
+-1.0f 0.0f 0.0f 0.0f 0.0f 1.0f 0.0f 0.0f 0.0f 0.0f -1.0f 0.0f 800.0f 000.0f -350.0f 1f
 
 **/
 
@@ -25,8 +29,21 @@ public class SceneManager implements Constants {
   Iterator<Event> queueIt;
   ListIterator<Event> listIt;
   
+  ArrayList<FloatBuffer> camFloatBuffers, charFloatBuffers;
+  
   //debug one; eventually read from a JSON or XML file
   public SceneManager(Minim m){
+    
+    camFloatBuffers = new ArrayList<FloatBuffer>();
+    float[] matrix1 = {0.7f, 0.0f, 0.7f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f, 0.7f, 0.0f, -0.7f, 0.0f, 100.0f, 000.0f, -100.0f, 1f};
+    camFloatBuffers.add(FloatBuffer.wrap(matrix1));
+    
+    charFloatBuffers = new ArrayList<FloatBuffer>();
+    float[] matrix2 = {1.0f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f, 240.0f, 000.0f, -350.0f, 1f};
+    charFloatBuffers.add(FloatBuffer.wrap(matrix2));
+    
+    float[] matrix3 = {1.0f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f, 800.0f, 000.0f, -350.0f, 1f};
+    charFloatBuffers.add(FloatBuffer.wrap(matrix3));
     
 //    camPosList = new LinkedList<Event>();
 //    charPosList = new LinkedList<Event>();
@@ -54,7 +71,7 @@ public class SceneManager implements Constants {
   }
   public void addJunkWithAudio(Minim mn){
     eventList = new LinkedList<Event>();
-    eventList.add(new CamPos(10,10,2));
+//    eventList.add(new CamPos(10,10,2));
     
     eventList.add(new Dialog("groove.mp3", 2, mn));
     
@@ -121,6 +138,14 @@ public class SceneManager implements Constants {
     }
     return d;
     
+  }
+  
+  public ArrayList<FloatBuffer> getCamFloatBuffers(){
+    return camFloatBuffers;
+  }
+  
+  public ArrayList<FloatBuffer> getCharFloatBuffers(){
+    return charFloatBuffers;
   }
   
 }

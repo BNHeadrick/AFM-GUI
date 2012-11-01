@@ -74,40 +74,58 @@ void setup() {
     println("Incorrect file format for number of cameras");
     return;
   }
-  int numOfCams = int(tokens[0]);
-  for (int i=1; i<numOfCams+1; i++) {
+//  int numOfCams = int(tokens[0]);
+//  for (int i=1; i<numOfCams+1; i++) {
+//
+//    tokens = split(lines[i], " ");
+//    float[] matrix = new float[16];
+//    for (int j=0; j<tokens.length; j++) {
+//      matrix[j] = float(tokens[j]);
+//    }
+//
+//    cameras.add(new Cam(FloatBuffer.wrap(matrix))); // add all the cameras
+//  }
+//
+//  tokens = split(lines[1 + numOfCams], " ");
+//  if (tokens.length != 1) {
+//    println("Incorrect file format for number of characters");
+//    return;
+//  }
 
-    tokens = split(lines[i], " ");
-    float[] matrix = new float[16];
-    for (int j=0; j<tokens.length; j++) {
-      matrix[j] = float(tokens[j]);
+//want to get the (initial position) floatbuffers info from scenemanager.
+//that way I can make the cam array here and still have the later on event floatbuffers in scenemanager
+  
+  ArrayList camFloatBuffers = sm.getCamFloatBuffers();
+  int numOfCams = camFloatBuffers.size();
+  for(int i = 0; i<numOfCams; i++){
+    cameras.add(new Cam((FloatBuffer)camFloatBuffers.get(i)));
+  }
+
+//  int numOfChars = int(tokens[0]);
+//  for (int i= 2 + numOfCams; i<lines.length; i++) {
+//    tokens = split(lines[i], " ");
+//    float[] matrix = new float[16];
+//    for (int j=0; j<tokens.length; j++) {
+//      matrix[j] = float(tokens[j]);
+//    }
+//
+//    characters.add(new Character(FloatBuffer.wrap(matrix))); // add all the characters
+//  }
+
+    ArrayList charFloatBuffers = sm.getCharFloatBuffers();
+    int numOfChars = charFloatBuffers.size();
+    for(int i = 0; i<numOfChars; i++){
+      characters.add(new Character((FloatBuffer)charFloatBuffers.get(i)));
     }
-
-    cameras.add(new Cam(FloatBuffer.wrap(matrix))); // add all the cameras
-  }
-
-  tokens = split(lines[1 + numOfCams], " ");
-  if (tokens.length != 1) {
-    println("Incorrect file format for number of characters");
-    return;
-  }
-  int numOfChars = int(tokens[0]);
-  for (int i= 2 + numOfCams; i<lines.length; i++) {
-    tokens = split(lines[i], " ");
-    float[] matrix = new float[16];
-    for (int j=0; j<tokens.length; j++) {
-      matrix[j] = float(tokens[j]);
-    }
-
-    characters.add(new Character(FloatBuffer.wrap(matrix))); // add all the characters
-  }
 
     characters.get(0).col=color(255,255,0);
     characters.get(1).col=color(255,0,255);
     
     timeline = new Timeline(sm);
     //add initial tick to the begining of the timeline
-    timeline.addTick(cameras.get(0));
+    if(cameras!=null && cameras.size() > 0){
+      timeline.addTick(cameras.get(0));
+    }
     
     debug = new Debug(controlP5);
     
@@ -332,6 +350,10 @@ void keyPressed() {
   if (key == 'p' || key == 'P') {
     timeline.pause();
   }
+  //testing event.
+//  if (key == 'b' || key == 'B') {
+//    cameras.get(0).junkSetMVM();
+//  }
 }
 
 /*

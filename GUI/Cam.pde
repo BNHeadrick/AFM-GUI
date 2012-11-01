@@ -186,10 +186,7 @@ class Cam {
     col = c;
   }
   
-  void setNextShapeActive(){
-    
-    isNext = true;
-  }
+
   
   public FloatBuffer getModelViewMatrix(){
     FloatBuffer newBuffer = FloatBuffer.allocate(16);
@@ -201,6 +198,18 @@ class Cam {
     
     return newBuffer;
     
+  }
+  
+  public void setModelViewMatrix(FloatBuffer fb){
+    this.modelViewMatrix = fb;
+  }
+  
+  public void junkSetMVM(){
+    
+//    1.0f 0.0f 0.0f 0.0f 0.0f 1.0f 0.0f 0.0f 0.0f 0.0f 1.0f 0.0f 450.0f 000.0f -550.0f 1f
+    
+    modelViewMatrix.put(0, 1.0f);
+
   }
   
 }
