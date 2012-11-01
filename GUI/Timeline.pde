@@ -4,31 +4,42 @@
 
 //TODO: tie the camera data structure with tick management
 
-
 public class Timeline {
   HScrollbar hs1; //scrollbar
   SceneManager sMan;
   int curFrame;
   boolean tickEdit = false;
-  //audio object
+  ControlP5 cp5;
+  Textarea pacingTextarea, dialogTextarea;
   
   
   //scrollbar attributes
   public int hsXPos = 50, hsYPos = height-(height/8), hsWidth=width-100, 
   hsHeight = 25, looseVal = 1, totalTime = 120, fps = 30, disp = 50;
+
+  
   
   ArrayList<Tick> tickArr;
 //  ArrayList<Event> eventArr;
   
     
-  Timeline(SceneManager sManager) {
-
+  Timeline(SceneManager sManager, ControlP5 contP5) {
+    cp5 = contP5;
     hs1 = new HScrollbar(hsXPos, hsYPos, hsWidth, hsHeight, looseVal, disp);
     sMan = sManager;
     
     
     tickArr = new ArrayList();
-//    eventArr = new ArrayList();  //TODO; EVERYTHING WITH EVENTS!
+
+    pacingTextarea = cp5.addTextarea("Pacing", "", 100, 590, 1050, 12);
+    pacingTextarea.setColorBackground(color(0,100));
+    
+    
+    dialogTextarea = cp5.addTextarea("dialog", "", 100, 660, 1050, 12);
+    dialogTextarea.setColorBackground(color(0,100));
+                  
+
+//    pacingTextarea.setText("Lorem Ipsum is simply dummy text of the printing and typesetting");
 
   }
   
@@ -118,6 +129,13 @@ public class Timeline {
     
   }
   
+  public void setPacingText(String txt){
+    pacingTextarea.setText(txt);
+  }
+  
+  public void setDialogText(String txt){
+    dialogTextarea.setText(txt);
+  }
   
   class HScrollbar {
     int swidth, sheight;    // width and height of bar

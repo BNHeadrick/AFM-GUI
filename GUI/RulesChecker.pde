@@ -173,6 +173,7 @@ public class RulesChecker implements Constants{
   }
   
   public void checkCuttingOnAction(SceneManager sm, Timeline tl){
+    tl.setDialogText("");
     LinkedList<Event> eList = sm.getEventList();
     ArrayList<Tick> tArr = tl.getTickArr();
     ListIterator<Event> listIt;
@@ -188,6 +189,7 @@ public class RulesChecker implements Constants{
         if((tempEvent.getType()==DIA_TIME) && (tempEvent.getTimeStamp()==tArr.get(i).getTimeStamp())){
           println("CUTTING ON ACTION ERROR!");
           tArr.get(i).setCutViolation(true);
+          tl.setDialogText("Cutting On Action Violation");
         }
         else{
           tArr.get(i).setCutViolation(false);
@@ -216,10 +218,12 @@ public class RulesChecker implements Constants{
       int average = total/(tArr.size()-1);
       println("totalAverage is " + average);
       
+      tl.setPacingText("");
       //compare the average to the actual distribution of tick events
       for(int i = 0; i<delTimeArr.length; i++){
         if(!(delTimeArr[i] < (average+20) && delTimeArr[i] > (average-20)) || delTimeArr[i]<3){
           tArr.get(i+1).setPacingViolation(true);
+          tl.setPacingText("Pacing Violation");
         }
         else{
           if(tArr.get(i+1).getPacingViolation()){

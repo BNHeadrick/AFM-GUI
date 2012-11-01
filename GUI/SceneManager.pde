@@ -152,7 +152,7 @@ public class SceneManager implements Constants {
     
     float[] matrix1 = {1.0f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f, 500.0f, 000.0f, -350.0f, 1f};
 //    charMoveBuffers.add(FloatBuffer.wrap(matrix1));
-    eventList.add(new CharPos(FloatBuffer.wrap(matrix1), chars.get(0), 30));
+    eventList.add(new CharPos(FloatBuffer.wrap(matrix1), chars.get(0), 3));
     
     eventList.add(new Dialog("groove2.mp3", 60, mn));
     

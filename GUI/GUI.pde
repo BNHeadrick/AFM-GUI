@@ -3,7 +3,7 @@ import ddf.minim.signals.*;
 import ddf.minim.analysis.*;
 import ddf.minim.effects.*;
 
-import controlP5.*;
+//import controlP5.*;
 
 import Jama.*;
 import javax.media.opengl.*;
@@ -127,7 +127,7 @@ void setup() {
     characters.get(0).col=color(255,255,0);
     characters.get(1).col=color(255,0,255);
     
-    timeline = new Timeline(sm);
+    timeline = new Timeline(sm, controlP5);
     //add initial tick to the begining of the timeline
     if(cameras!=null && cameras.size() > 0){
       timeline.addTick(cameras.get(0));
