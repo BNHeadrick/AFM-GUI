@@ -99,6 +99,25 @@ public class Timeline {
     return tickEdit;
   }
   
+  public int getPosInSeconds(){
+    return hs1.getPosInSeconds();
+  }
+  
+  //this is only (and should only) be called when the tickEdit toggle is enabled.
+  public Cam deleteCurrentTick(){
+    Cam retCam = null;
+    for(int i = 0; i<tickArr.size(); i++){
+      if(tickArr.get(i).getTimeStamp() == hs1.getPosInSeconds()){
+        retCam = tickArr.get(i).getCam();
+        tickArr.remove(i);
+        return retCam;
+      }
+
+    }
+    return retCam;
+    
+  }
+  
   
   class HScrollbar {
     int swidth, sheight;    // width and height of bar

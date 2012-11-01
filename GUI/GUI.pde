@@ -312,9 +312,18 @@ void keyPressed() {
     timeline.toggleTickEdit();
     
   }
-  if (timeline.tickEditIsOn() && (key == 'x' || key == 'X') {
+  if (timeline.tickEditIsOn() && (key == 'x' || key == 'X')) {
     //Scrub (snap) through ticks
-    timeline.deleteCurrentTick();
+    Cam toBeRemoved = timeline.deleteCurrentTick();
+
+//    println(toBeRemoved);
+  
+    for(int i = 0; i<cameras.size(); i++){
+      if(cameras.get(i) == toBeRemoved){
+//        println("removed");
+        cameras.remove(i);
+      }
+    }
     
   }
   if (key == 'l' || key == 'L') {
