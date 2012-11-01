@@ -9,6 +9,7 @@ public class Timeline {
   HScrollbar hs1; //scrollbar
   SceneManager sMan;
   int curFrame;
+  boolean tickEdit = false;
   //audio object
   
   
@@ -88,6 +89,14 @@ public class Timeline {
   
   public int getScrollbarTimeInSecs(){
     return hs1.getPosInSeconds();
+  }
+  
+  public void toggleTickEdit(){
+    tickEdit = !tickEdit;
+  }
+  
+  public boolean tickEditIsOn(){
+    return tickEdit;
   }
   
   
@@ -178,22 +187,50 @@ public class Timeline {
           }
         
         }
-        //snap to nearest (previous) second
+        
         else{
-          //neive timeline placement.  Implement snapping below.
-          spos = spos + (newspos-spos)/loose;
-
-//          println(getPosInSeconds());
-          int lowerLimit = (int)getPosInSeconds()-1;
-          float tempPos = spos;
-//          println("BEFORE WHILE: lower limit is " + lowerLimit + " if condition is " + (getPosInSeconds(tempPos)) + " spos is " +spos);
-          while( getPosInSeconds((int)tempPos) > lowerLimit ){
-            tempPos = tempPos-1;
-//            println("lower limit is " + lowerLimit + " reduced tempPos is " + tempPos + " spos is " +spos);
+          //snap to nearest (previous) tick
+          if(tickEdit){
+            
+            //neive timeline placement.  Implement snapping below.
+            spos = spos + (newspos-spos)/loose;
+  
+  //          println(getPosInSeconds());
+            //get closest (previous) tick
+            int lowerLimit = tickArr.get(0).getTimeStamp();
+            for(int i = 0; i<tickArr.size(); i++){
+              if(tickArr.get(i).getTimeStamp() < getPosInSeconds())
+              lowerLimit = tickArr.get(i).getTimeStamp();
+            }
+            float tempPos = spos;
+  //          println("BEFORE WHILE: lower limit is " + lowerLimit + " if condition is " + (getPosInSeconds(tempPos)) + " spos is " +spos);
+            while( getPosInSeconds((int)tempPos) > lowerLimit ){
+              tempPos = tempPos-1;
+  //            println("lower limit is " + lowerLimit + " reduced tempPos is " + tempPos + " spos is " +spos);
+            }
+            //don't go below 0 seconds
+            if(tempPos >displacement){
+              spos = tempPos;
+            }
+            
           }
-          //don't go below 0 seconds
-          if(tempPos >displacement){
-            spos = tempPos;
+          //snap to nearest (previous) second
+          else{
+            //neive timeline placement.  Implement snapping below.
+            spos = spos + (newspos-spos)/loose;
+  
+  //          println(getPosInSeconds());
+            int lowerLimit = (int)getPosInSeconds()-1;
+            float tempPos = spos;
+  //          println("BEFORE WHILE: lower limit is " + lowerLimit + " if condition is " + (getPosInSeconds(tempPos)) + " spos is " +spos);
+            while( getPosInSeconds((int)tempPos) > lowerLimit ){
+              tempPos = tempPos-1;
+  //            println("lower limit is " + lowerLimit + " reduced tempPos is " + tempPos + " spos is " +spos);
+            }
+            //don't go below 0 seconds
+            if(tempPos >displacement){
+              spos = tempPos;
+            }
           }
         }
       }

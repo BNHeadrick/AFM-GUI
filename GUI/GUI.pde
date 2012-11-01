@@ -309,6 +309,12 @@ void keyPressed() {
   }
   if (key == 'y' || key == 'Y') {
     //Scrub (snap) through ticks
+    timeline.toggleTickEdit();
+    
+  }
+  if (timeline.tickEditIsOn() && (key == 'x' || key == 'X') {
+    //Scrub (snap) through ticks
+    timeline.deleteCurrentTick();
     
   }
   if (key == 'l' || key == 'L') {
