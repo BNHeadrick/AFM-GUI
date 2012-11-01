@@ -29,10 +29,11 @@ public class SceneManager implements Constants {
   Iterator<Event> queueIt;
   ListIterator<Event> listIt;
   
-  ArrayList<FloatBuffer> camFloatBuffers, charFloatBuffers;
+  ArrayList<FloatBuffer> camFloatBuffers, charFloatBuffers, charMoveBuffers;
+  ArrayList<Character> charArr;
   
   //debug one; eventually read from a JSON or XML file
-  public SceneManager(Minim m){
+  public SceneManager(){
     
     camFloatBuffers = new ArrayList<FloatBuffer>();
     float[] matrix1 = {0.7f, 0.0f, 0.7f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f, 0.7f, 0.0f, -0.7f, 0.0f, 100.0f, 000.0f, -100.0f, 1f};
@@ -51,38 +52,29 @@ public class SceneManager implements Constants {
     
     //TODO; read from input file and populate the List objects;
     //for now, just use addJunk; later use populateList() instead
-    addJunkWithAudio(m);
+//    addJunkWithAudio(m);
 //    addJunk();
     //createQueue(0);
 
   }
   
-  //LEGACY DON'T USE!
-  public void addJunk(){
+//  public void addJunkWithAudio(Minim mn){
 //    eventList = new LinkedList<Event>();
-//    eventList.add(new CamPos(10,10,2));
-//    eventList.add(new Dialog(null, 3));
-//    eventList.add(new Dialog("groove.mp3", 50));
-//    eventList.add(new CharPos(50,50,4));
-//    eventList.add(new CharPos(50,50,5));
+////    eventList.add(new CamPos(10,10,2));
+//
+//    eventList.add(new Dialog("groove.mp3", 2, mn));
+//    eventList.add(new Dialog("groove2.mp3", 3, mn));
 //    
-//    createQueue(0);
-    
-  }
-  public void addJunkWithAudio(Minim mn){
-    eventList = new LinkedList<Event>();
-//    eventList.add(new CamPos(10,10,2));
-    
-    eventList.add(new Dialog("groove.mp3", 2, mn));
-    
-    eventList.add(new Dialog("groove2.mp3", 60, mn));
-    
-    eventList.add(new CharPos(50,50,4));
-    eventList.add(new CharPos(50,50,5));
-    
-    createQueue(0);
-    
-  }
+////    charMoveBuffers = new ArrayList<FloatBuffer>();
+//    
+//    
+//    
+//    
+////    eventList.add(new CharPos(50,50,5));
+//    
+//    
+//    
+//  }
   
   //TODO: everything; make it read from a file.
   public void populateList(){
@@ -94,6 +86,7 @@ public class SceneManager implements Constants {
     eventQueue = new LinkedList<Event>();
     while(listIt.hasNext()){
       eventQueue.add(listIt.next());
+      
     }
   }
   
@@ -146,6 +139,25 @@ public class SceneManager implements Constants {
   
   public ArrayList<FloatBuffer> getCharFloatBuffers(){
     return charFloatBuffers;
+  }
+  
+  //kinda hacky for now.  Eventually, make this take in which exact char to associate this with from the input JSON
+  public void junkSetData(ArrayList<Character> chars, Minim mn){
+    
+    eventList = new LinkedList<Event>();
+//    eventList.add(new CamPos(10,10,2));
+
+    eventList.add(new Dialog("groove.mp3", 2, mn));
+    
+    
+    float[] matrix1 = {1.0f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f, 500.0f, 000.0f, -350.0f, 1f};
+//    charMoveBuffers.add(FloatBuffer.wrap(matrix1));
+    eventList.add(new CharPos(FloatBuffer.wrap(matrix1), chars.get(0), 30));
+    
+    eventList.add(new Dialog("groove2.mp3", 60, mn));
+    
+    sm.createQueue(0);
+    
   }
   
 }

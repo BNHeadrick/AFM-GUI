@@ -96,4 +96,9 @@ class Character {
     matrix[12] = x;
     matrix[14] = -y;
   }
+  
+  public void setModelViewMatrix(FloatBuffer fb){
+    this.modelViewMatrix = fb;
+  }
+  
 }

@@ -52,7 +52,7 @@ void setup() {
   minim = new Minim(this);
   size(winWidth, winHeight, OPENGL);
   background(bGround);
-  sm = new SceneManager(minim);
+  sm = new SceneManager();
   rulesChecker = new RulesChecker();
 
   controlP5 = new ControlP5(this);
@@ -99,7 +99,9 @@ void setup() {
   int numOfCams = camFloatBuffers.size();
   for(int i = 0; i<numOfCams; i++){
     cameras.add(new Cam((FloatBuffer)camFloatBuffers.get(i)));
+    
   }
+  
 
 //  int numOfChars = int(tokens[0]);
 //  for (int i= 2 + numOfCams; i<lines.length; i++) {
@@ -117,6 +119,10 @@ void setup() {
     for(int i = 0; i<numOfChars; i++){
       characters.add(new Character((FloatBuffer)charFloatBuffers.get(i)));
     }
+    //used to setup charMoveEvens
+    sm.junkSetData(characters, minim);
+    
+    
 
     characters.get(0).col=color(255,255,0);
     characters.get(1).col=color(255,0,255);
@@ -133,6 +139,8 @@ void setup() {
     //controlP5.addSlider("Timeline", 0,120,0,100,winHeight-50,winWidth-200,30);
 
 }
+
+
 
 void draw() { // display things
 

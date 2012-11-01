@@ -155,7 +155,7 @@ public class Timeline {
       if(isPlaying){
         //only plays sound for dialog
         if(sMan.eventHappened(getPosInSeconds())){
-          //put sound code here!!!
+          
           sMan.peekNextEvent().execute(getPosInSeconds());
           println(sMan.popEvent());
         }
