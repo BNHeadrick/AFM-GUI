@@ -58,7 +58,7 @@ public class SceneManager implements Constants {
     
     eventList.add(new Dialog("groove.mp3", 2, mn));
     
-    eventList.add(new Dialog("groove2.mp3", 6, mn));
+    eventList.add(new Dialog("groove2.mp3", 60, mn));
     
     eventList.add(new CharPos(50,50,4));
     eventList.add(new CharPos(50,50,5));

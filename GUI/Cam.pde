@@ -191,5 +191,17 @@ class Cam {
     isNext = true;
   }
   
+  public FloatBuffer getModelViewMatrix(){
+    FloatBuffer newBuffer = FloatBuffer.allocate(16);
+
+
+    for(int i = 0; 1<16; i++){
+      newBuffer.put(i, modelViewMatrix.get(i));
+    }
+    
+    return newBuffer;
+    
+  }
+  
 }
 

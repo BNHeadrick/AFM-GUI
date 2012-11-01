@@ -294,6 +294,10 @@ public class Timeline {
       println("pause");
       isPlaying = false;
       
+      //find if previous dialog audio exists, and if so, pause it.
+      if(sMan.getPreviousPoppedDialog(getPosInSeconds()) != null){
+        sMan.getPreviousPoppedDialog(getPosInSeconds()).pauseAudio();
+      }
        
     }
     

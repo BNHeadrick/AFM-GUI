@@ -302,7 +302,8 @@ void keyPressed() {
         
         //need to find which tick is before/after the one that would be placed here
         //TODO above
-        timeline.addTick(cameras.get(i));
+        cameras.add(new Cam(cameras.get(i).getModelViewMatrix()));
+        timeline.addTick(cameras.get(i+1));
       }
     }
   }
