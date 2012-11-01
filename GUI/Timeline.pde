@@ -155,6 +155,7 @@ public class Timeline {
         newspos = constrain(mouseX-sheight/2, sposMin, sposMax);
       }
 
+      //if the scrubber has either been moved or the timeline's play function is executing
       if(abs(newspos - spos) > 1 || isPlaying) {
         
         //if playback has collided with the end of the timeline, stop playing
@@ -177,8 +178,23 @@ public class Timeline {
           }
         
         }
+        //snap to nearest (previous) second
         else{
+          //neive timeline placement.  Implement snapping below.
           spos = spos + (newspos-spos)/loose;
+
+//          println(getPosInSeconds());
+          int lowerLimit = (int)getPosInSeconds()-1;
+          float tempPos = spos;
+//          println("BEFORE WHILE: lower limit is " + lowerLimit + " if condition is " + (getPosInSeconds(tempPos)) + " spos is " +spos);
+          while( getPosInSeconds((int)tempPos) > lowerLimit ){
+            tempPos = tempPos-1;
+//            println("lower limit is " + lowerLimit + " reduced tempPos is " + tempPos + " spos is " +spos);
+          }
+          //don't go below 0 seconds
+          if(tempPos >displacement){
+            spos = tempPos;
+          }
         }
       }
       //if the timeline is NOT playing, create the queue for the events to unfold in order
@@ -273,6 +289,10 @@ public class Timeline {
     
     public int getPosInSeconds() {
       return (int)(((spos-displacement)/swidth)*totalTime);
+    }
+    
+    public int getPosInSeconds(float curPos){
+      return (int)(((curPos-displacement)/swidth)*totalTime);
     }
     
     //EVENTUALLY REMOVE THIS FUNCTION; need to rely on incrementFrame instead
