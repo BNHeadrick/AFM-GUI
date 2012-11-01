@@ -1,4 +1,7 @@
-
+import ddf.minim.*;
+import ddf.minim.signals.*;
+import ddf.minim.analysis.*;
+import ddf.minim.effects.*;
 
 import controlP5.*;
 
@@ -34,14 +37,23 @@ float globalCameraZ = 0;
 
 int winHeight = 720, winWidth = 1280;
 
-RulesChecker rulesChecker = new RulesChecker();
+RulesChecker rulesChecker;
 Timeline timeline;
+SceneManager sm;
 
 Debug debug;
+Minim minim;
+
+
+// current frame of the scene - set by KinectFingerTracker
+int currentFrame;
 
 void setup() {
+  minim = new Minim(this);
   size(winWidth, winHeight, OPENGL);
   background(bGround);
+  sm = new SceneManager(minim);
+  rulesChecker = new RulesChecker();
 
   controlP5 = new ControlP5(this);
   //ruleChoiceList = controlP5.addDropdownList("ruleChoiceList",850,100,100,100);
@@ -93,7 +105,9 @@ void setup() {
     characters.get(0).col=color(255,255,0);
     characters.get(1).col=color(255,0,255);
     
-    timeline = new Timeline();
+    timeline = new Timeline(sm);
+    //add initial tick to the begining of the timeline
+    timeline.addTick(cameras.get(0));
     
     debug = new Debug(controlP5);
     
@@ -104,6 +118,7 @@ void setup() {
 
 void draw() { // display things
 
+  //execute sceneManager stuff
   resetMatrix();
   //beginCamera();
   camera();
@@ -166,6 +181,9 @@ void draw() { // display things
         resetAllCams();
     }
   }
+  
+  rulesChecker.checkCuttingOnAction(sm, timeline);
+  rulesChecker.checkPacing(sm, timeline);
 
   /* This is for camera rotation using a and d
    resetMatrix();
@@ -183,6 +201,7 @@ void draw() { // display things
 
   controlP5.draw();
   timeline.draw();
+  
 }
 
 //used for debugging
@@ -325,7 +344,7 @@ void oscEvent(OscMessage theOscMessage) {
 
   //Friedrich added this select camera event
   if (theOscMessage != null && theOscMessage.checkAddrPattern("/selectActorByName")) {
-    println("yay!");
+    println("select Actor!");
     String myNewCamera=theOscMessage.get(0).stringValue();
 
     println(myNewCamera);
@@ -382,6 +401,14 @@ void oscEvent(OscMessage theOscMessage) {
     // Change this variable based on the data received from OSC
     //    int selectedCamera = 5;
     cameras.get(selectedCamera).modelViewMatrix = fb;
+  }
+  
+  // receive the currentFrame from kinect
+  // this is where the playhead is on the timeline
+  // currentFrame is global
+   if (theOscMessage != null && theOscMessage.checkAddrPattern("/setPlayheadFrame/int")) {
+   currentFrame = theOscMessage.get(0).intValue();
+    println("Current Frame: " + currentFrame);
   }
 }
 

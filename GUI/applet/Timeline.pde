@@ -3,19 +3,31 @@
 **/
 
 //TODO: tie the camera data structure with tick management
+
+
 public class Timeline {
   HScrollbar hs1; //scrollbar
+  SceneManager sMan;
+  int curFrame;
+  //audio object
+  
   
   //scrollbar attributes
-  public int hsXPos = 50, hsYPos = height-(height/8), hsWidth=width-100, hsHeight = 25, looseVal = 1, totalTime = 120;
+  public int hsXPos = 50, hsYPos = height-(height/8), hsWidth=width-100, 
+  hsHeight = 25, looseVal = 1, totalTime = 120, fps = 30, disp = 50;
+  
   ArrayList<Tick> tickArr;
+//  ArrayList<Event> eventArr;
   
     
-  Timeline() {
+  Timeline(SceneManager sManager) {
+
+    hs1 = new HScrollbar(hsXPos, hsYPos, hsWidth, hsHeight, looseVal, disp);
+    sMan = sManager;
     
-    hs1 = new HScrollbar(hsXPos, hsYPos, hsWidth, hsHeight, looseVal);
     
     tickArr = new ArrayList();
+//    eventArr = new ArrayList();  //TODO; EVERYTHING WITH EVENTS!
 
   }
   
@@ -36,17 +48,13 @@ public class Timeline {
   }
   
   void addTick(Cam c){
-//      tickArr.add(new Tick());
-////      tickArr.get(tickArr.size()-1).setToActive();
-//      for(int i = 0; i<tickArr.size()-1; i++){
-//        tickArr.get(i).setToInActive();
-//      }
-
-    tickArr.add(new Tick(hs1.getSliderPos(), hsYPos, c));
+    tickArr.add(new Tick(hs1.getSliderPos(), hsYPos, c, hs1.getPosInSeconds()));
     //set the older ticks to inactive
     for(int i = 0; i<tickArr.size()-1; i++){
       tickArr.get(i).setToInActive();
     }
+    //sort the ticks in case one was placed before an existing tick
+    Collections.sort(tickArr);
   }
   
   ArrayList<Tick> getTickArr(){
@@ -67,8 +75,19 @@ public class Timeline {
     hs1.executePlay();
   }
   
+  //used or scrubbing
+  void setFrame(int frameNum){
+    hs1.setSposWithFrame(frameNum);
+  }
+  
   void pause(){
+    println(hs1.getSliderPos());
     hs1.executePause();
+    println(hs1.getSliderPos());
+  }
+  
+  public int getScrollbarTimeInSecs(){
+    return hs1.getPosInSeconds();
   }
   
   
@@ -84,8 +103,10 @@ public class Timeline {
     Tick prevTick, nextTick;
     long startTime;
     boolean isPlaying = false;
+    int displacement = 0;
   
-    HScrollbar (float xp, float yp, int sw, int sh, int l) {
+    HScrollbar (float xp, float yp, int sw, int sh, int l, int dis) {
+      displacement = dis;
       swidth = sw;
       sheight = sh;
       int widthtoheight = sw - sh;
@@ -100,7 +121,25 @@ public class Timeline {
     }
   
     void update() {
-      if(overEvent()) {
+      
+      
+
+      if(isPlaying){
+        //only plays sound for dialog
+        if(sMan.eventHappened(getPosInSeconds())){
+          //put sound code here!!!
+          sMan.peekNextEvent().execute(getPosInSeconds());
+          println(sMan.popEvent());
+        }
+        
+        //find if previous dialog should still be playing, and if so, play it
+        if(sMan.getPreviousPoppedDialog(getPosInSeconds()) != null){
+          sMan.getPreviousPoppedDialog(getPosInSeconds()).execute(getPosInSeconds());
+//          println(sMan.getPreviousPoppedDialog(getPosInSeconds()));
+        }
+      }
+      
+      if(overSlide()) {
         over = true;
       } else {
         over = false;
@@ -117,6 +156,13 @@ public class Timeline {
       }
 
       if(abs(newspos - spos) > 1 || isPlaying) {
+        
+        //if playback has collided with the end of the timeline, stop playing
+        if(isPlaying){
+          if(getPosInSeconds() >= totalTime){
+            executePause();
+          }
+        }
                 
         if(isPlaying){
           long estimatedTime = System.nanoTime() - startTime;
@@ -124,15 +170,19 @@ public class Timeline {
           if(estimatedTime/1000000000 >= 1){
             //if one second has passed, make a new start time (reset the second timer)
             startTime = System.nanoTime();
-            println("before spos is " + spos + " time is " + getPosInSeconds());
+//            println("before spos is " + spos + " time is " + getPosInSeconds());
             spos = incrementSposInSeconds();
-            println("after spos is " + spos + " time is " + getPosInSeconds());
+            println("spos is " + spos + " time is " + getPosInSeconds() + " frame is " + getPosInFrames());
           }
         
         }
         else{
           spos = spos + (newspos-spos)/loose;
         }
+      }
+      //if the timeline is NOT playing, create the queue for the events to unfold in order
+      if(!isPlaying){
+        sMan.createQueue(getPosInSeconds()); 
       }
 //      println(getPosInSeconds());
 
@@ -142,7 +192,7 @@ public class Timeline {
       return min(max(val, minv), maxv);
     }
   
-    boolean overEvent() {
+    boolean overSlide() {
       if(mouseX > xpos && mouseX < xpos+swidth &&
          mouseY > ypos && mouseY < ypos+sheight) {
         return true;
@@ -163,7 +213,8 @@ public class Timeline {
         fill(102, 102, 102);
       }
       //scrubber
-      rect(spos, ypos, sheight, sheight);
+      //println(spos);
+      rect(spos-sheight/2, ypos, sheight, sheight);
       
       for(int i = 0; i<tickArr.size(); i++){
         tickArr.get(i).displayTick();
@@ -197,20 +248,38 @@ public class Timeline {
       }
 
     }
-    public int getPosInSeconds() {
-      return (int)(((spos-50)/swidth)*totalTime);
+    
+    //todo; this
+    private int incrementSposInFrames(){
+      return 0;
     }
     
-    public int incrementSposInSeconds(){
+    public void setSposWithFrame(int frameNum){
+      spos = fps*frameNum+displacement;
+    }
+    
+    public int getPosInFrames(){
+      return (int)(((spos-displacement)/swidth)*(totalTime))*fps;
+    }
+    
+    public int getPosInSeconds() {
+      return (int)(((spos-displacement)/swidth)*totalTime);
+    }
+    
+    //EVENTUALLY REMOVE THIS FUNCTION; need to rely on incrementFrame instead
+    private int incrementSposInSeconds(){
 //      println(getPosInSeconds());
 //      println("posInSec " + getPosInSeconds() + " swidth+50 " + (swidth+50) + " " + (1/totalTime) + " " + (1.0/totalTime)*swidth*50);
 
-      return (int)(((((float)getPosInSeconds()+ 1.5)/(totalTime))*swidth)+50);
+      return (int)(((((float)getPosInSeconds()+ 1.5)/(totalTime))*swidth)+displacement);
       
     }
     
     public float getSliderPos(){
       return spos;
+    }
+    public void setSpos(float s){
+      spos = s;
     }
     
     public void executePlay(){
@@ -223,9 +292,9 @@ public class Timeline {
     
     public void executePause(){
       println("pause");
-      //long estimatedTime = System.nanoTime() - startTime;
-      //println(estimatedTime/1000000);    //convert it to milliseconds
       isPlaying = false;
+      
+       
     }
     
   }

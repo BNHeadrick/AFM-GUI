@@ -55,8 +55,11 @@ public class SceneManager implements Constants {
   public void addJunkWithAudio(Minim mn){
     eventList = new LinkedList<Event>();
     eventList.add(new CamPos(10,10,2));
-//    eventList.add(new Dialog(null, 3, mn));
+    
     eventList.add(new Dialog("groove.mp3", 2, mn));
+    
+    eventList.add(new Dialog("groove2.mp3", 6, mn));
+    
     eventList.add(new CharPos(50,50,4));
     eventList.add(new CharPos(50,50,5));
     
@@ -100,6 +103,24 @@ public class SceneManager implements Constants {
   
   public LinkedList<Event> getEventList(){
     return eventList; 
+  }
+  
+  public Dialog getPreviousPoppedDialog(int time){
+    
+    Dialog d = null;
+    
+    listIt = eventList.listIterator();
+    while(listIt.hasNext()){
+      Event temp = listIt.next();
+      if(temp.getTimeStamp() > time){
+        break;
+      }
+      if(temp.getType()==DIA_TIME){
+        d=(Dialog)temp;
+      }
+    }
+    return d;
+    
   }
   
 }

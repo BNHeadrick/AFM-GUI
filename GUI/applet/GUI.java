@@ -1,6 +1,10 @@
 import processing.core.*; 
 import processing.xml.*; 
 
+import ddf.minim.*; 
+import ddf.minim.signals.*; 
+import ddf.minim.analysis.*; 
+import ddf.minim.effects.*; 
 import controlP5.*; 
 import Jama.*; 
 import javax.media.opengl.*; 
@@ -16,8 +20,16 @@ import Jama.*;
 import java.nio.FloatBuffer; 
 import Jama.*; 
 import controlP5.*; 
+import ddf.minim.*; 
+import ddf.minim.signals.*; 
+import ddf.minim.analysis.*; 
+import ddf.minim.effects.*; 
 import java.util.ArrayList; 
 import processing.opengl.*; 
+import java.util.Iterator; 
+import java.util.LinkedList; 
+import java.util.ListIterator; 
+import java.util.Queue; 
 
 import Jama.util.*; 
 import controlP5.*; 
@@ -57,6 +69,9 @@ public class GUI extends PApplet {
 
 
 
+
+
+
 ControlP5 controlP5;
 DropdownList ruleChoiceList;
 GL gl;
@@ -80,14 +95,23 @@ float globalCameraZ = 0;
 
 int winHeight = 720, winWidth = 1280;
 
-RulesChecker rulesChecker = new RulesChecker();
+RulesChecker rulesChecker;
 Timeline timeline;
+SceneManager sm;
 
 Debug debug;
+Minim minim;
+
+
+// current frame of the scene - set by KinectFingerTracker
+int currentFrame;
 
 public void setup() {
+  minim = new Minim(this);
   size(winWidth, winHeight, OPENGL);
   background(bGround);
+  sm = new SceneManager(minim);
+  rulesChecker = new RulesChecker();
 
   controlP5 = new ControlP5(this);
   //ruleChoiceList = controlP5.addDropdownList("ruleChoiceList",850,100,100,100);
@@ -139,7 +163,9 @@ public void setup() {
     characters.get(0).col=color(255,255,0);
     characters.get(1).col=color(255,0,255);
     
-    timeline = new Timeline();
+    timeline = new Timeline(sm);
+    //add initial tick to the begining of the timeline
+    timeline.addTick(cameras.get(0));
     
     debug = new Debug(controlP5);
     
@@ -150,6 +176,7 @@ public void setup() {
 
 public void draw() { // display things
 
+  //execute sceneManager stuff
   resetMatrix();
   //beginCamera();
   camera();
@@ -212,6 +239,9 @@ public void draw() { // display things
         resetAllCams();
     }
   }
+  
+  rulesChecker.checkCuttingOnAction(sm, timeline);
+  rulesChecker.checkPacing(sm, timeline);
 
   /* This is for camera rotation using a and d
    resetMatrix();
@@ -229,6 +259,7 @@ public void draw() { // display things
 
   controlP5.draw();
   timeline.draw();
+  
 }
 
 //used for debugging
@@ -371,7 +402,7 @@ public void oscEvent(OscMessage theOscMessage) {
 
   //Friedrich added this select camera event
   if (theOscMessage != null && theOscMessage.checkAddrPattern("/selectActorByName")) {
-    println("yay!");
+    println("select Actor!");
     String myNewCamera=theOscMessage.get(0).stringValue();
 
     println(myNewCamera);
@@ -428,6 +459,14 @@ public void oscEvent(OscMessage theOscMessage) {
     // Change this variable based on the data received from OSC
     //    int selectedCamera = 5;
     cameras.get(selectedCamera).modelViewMatrix = fb;
+  }
+  
+  // receive the currentFrame from kinect
+  // this is where the playhead is on the timeline
+  // currentFrame is global
+   if (theOscMessage != null && theOscMessage.checkAddrPattern("/setPlayheadFrame/int")) {
+   currentFrame = theOscMessage.get(0).intValue();
+    println("Current Frame: " + currentFrame);
   }
 }
 
@@ -681,6 +720,38 @@ class Cam {
   
 }
 
+public class CamPos extends Event{
+  
+  int xPos;
+  int yPos;
+  
+  public CamPos(int x, int y, int time){
+    xPos = x;
+    yPos = y;
+    timeStamp = time;
+    type = CAM_POS;
+  }
+  
+  public String toString(){
+    return "CamPos";
+  }
+}
+public class CharPos extends Event{
+  
+  int xPos;
+  int yPos;
+  
+  public CharPos(int x, int y, int time){
+    xPos = x;
+    yPos = y;
+    timeStamp = time;
+    type = CHAR_POS;
+  }
+  
+  public String toString(){
+    return "CharPos";
+  }
+}
 
 
 
@@ -780,6 +851,11 @@ class Character {
     matrix[14] = -y;
   }
 }
+interface Constants{
+  public final int CHAR_POS = 0;
+  public final int CAM_POS = 1;
+  public final int DIA_TIME = 2;
+}
 
 
 class DataManager {
@@ -794,6 +870,7 @@ class DataManager {
     }
   }
 }
+
 
 
 public class Debug{
@@ -827,7 +904,70 @@ public class Debug{
 
 
 
-public class RulesChecker {
+
+
+public class Dialog extends Event{
+  
+  AudioPlayer ap;
+  
+  //EVENTUALLY, ASSOCIATE A SOUNDFILE FROM THE CONSTRUCTOR AS WELL!!!
+  public Dialog(String sFile, int time, Minim m){
+    timeStamp = time;
+    type = DIA_TIME;
+    ap = m.loadFile(sFile, 2048);
+  }
+  
+  public String toString(){
+    return "Dialog of " + timeStamp;
+  }
+  
+  public void execute(int globalTime){
+    if(!ap.isPlaying()){
+      int playAt = globalTime - timeStamp;
+      ap.play(playAt);
+      println("gTime is " + globalTime + " delTime is " + playAt);
+    }
+  }
+  
+  public void pauseAudio(){
+    ap.pause();
+  }
+  
+}
+/**
+An Event is something that occurs on the timeline that is not observable from the timeline.  They are events that are pulled in from
+the scene manager, and include character movement times, dialogues, and camera positions.
+**/
+
+public class Event implements Constants{
+  int timeStamp;
+  int type;
+  
+  public Event(){
+  }
+  
+  public Event(String eventType){
+    
+  }
+  
+  public int getTimeStamp(){
+    return timeStamp; 
+  }
+  
+  public int getType(){
+    return type; 
+  }
+  
+  public void execute(int time){
+    
+  }
+
+  
+}
+
+
+
+public class RulesChecker implements Constants{
   public void checkLineOfAction(ArrayList<Cam> cameras, ArrayList<Character> characters, int selectedIdx) {
     if (cameras == null || cameras.isEmpty()) {
       println("No cameras in the scene!");
@@ -997,17 +1137,210 @@ public class RulesChecker {
     }
     return new PVector(finX, 0, finY);
   }
-}
+  
+  public void checkCuttingOnAction(SceneManager sm, Timeline tl){
+    LinkedList<Event> eList = sm.getEventList();
+    ArrayList<Tick> tArr = tl.getTickArr();
+    ListIterator<Event> listIt;
+  
+    for(int i = 0; i<tArr.size(); i++){
+//      println("here");
+      listIt = eList.listIterator();
+      while(listIt.hasNext()){
+        Event tempEvent = listIt.next();
+        //check for time colisions.
+//        println("event " + tempEvent.getTimeStamp() + " tick time " + tArr.get(i).getTimeStamp() + " " + tempEvent.type);
+        
+        if((tempEvent.getType()==DIA_TIME) && (tempEvent.getTimeStamp()==tArr.get(i).getTimeStamp())){
+          println("CUTTING ON ACTION ERROR!");
+          tArr.get(i).setCutViolation(true);
+        }
+        else{
+          tArr.get(i).setCutViolation(false);
+        }
+        
+      }
+    }
 
-class Tick{
+  }
+  
+  public void checkPacing(SceneManager sm, Timeline tl){
+    ArrayList<Tick> tArr = tl.getTickArr();
+    int[] delTimeArr= new int[tArr.size()-1]; 
+    
+    int total = 0;
+//    int count = 0;
+    if(tArr.size()>1){
+      for(int i = 1; i<tArr.size(); i++){
+        delTimeArr[i-1] = tArr.get(i).getTimeStamp()-tArr.get(i-1).getTimeStamp();
+        total = total + delTimeArr[i-1];
+      }
+      
+      println("current sscrubber is at time " + tl.getScrollbarTimeInSecs() );
+      println("totalTime is " + total);
+      
+      int average = total/(tArr.size()-1);
+      println("totalAverage is " + average);
+      
+      //compare the average to the actual distribution of tick events
+      for(int i = 0; i<delTimeArr.length; i++){
+        if(!(delTimeArr[i] < (average+20) && delTimeArr[i] > (average-20)) || delTimeArr[i]<3){
+          tArr.get(i+1).setPacingViolation(true);
+        }
+        else{
+          if(tArr.get(i+1).getPacingViolation()){
+            tArr.get(i+1).setPacingViolation(false);
+          }
+        }
+      }
+      
+    }
+    
+  }
+}
+/**
+
+here's the input file stuff:
+
+0.7f 0.0f 0.7f 0.0f 0.0f 1.0f 0.0f 0.0f 0.7f 0.0f -0.7f 0.0f 100.0f 000.0f -100.0f 1f
+1.0f 0.0f 0.0f 0.0f 0.0f 1.0f 0.0f 0.0f 0.0f 0.0f 1.0f 0.0f 450.0f 000.0f -550.0f 1f
+-0.7f 0.0f 0.7f 0.0f 0.0f 1.0f 0.0f 0.0f 0.7f 0.0f 0.7f 0.0f 100.0f 000.0f -550.0f 1f
+1.0f 0.0f 0.0f 0.0f 0.0f 1.0f 0.0f 0.0f 0.0f 0.0f -1.0f 0.0f 450.0f 000.0f -100.0f 1f
+
+I need to put this information into 
+
+**/
+
+
+
+
+
+
+
+//this class reads in a file that contains scene information, including camera positions, character positions, and dialog timestamps.
+public class SceneManager implements Constants {
+  
+  LinkedList<Event> eventList;
+  Queue<Event> eventQueue;
+  Iterator<Event> queueIt;
+  ListIterator<Event> listIt;
+  
+  //debug one; eventually read from a JSON or XML file
+  public SceneManager(Minim m){
+    
+//    camPosList = new LinkedList<Event>();
+//    charPosList = new LinkedList<Event>();
+//    dialogTimeList = new LinkedList<Event>();
+    
+    //TODO; read from input file and populate the List objects;
+    //for now, just use addJunk; later use populateList() instead
+    addJunkWithAudio(m);
+//    addJunk();
+    //createQueue(0);
+
+  }
+  
+  //LEGACY DON'T USE!
+  public void addJunk(){
+//    eventList = new LinkedList<Event>();
+//    eventList.add(new CamPos(10,10,2));
+//    eventList.add(new Dialog(null, 3));
+//    eventList.add(new Dialog("groove.mp3", 50));
+//    eventList.add(new CharPos(50,50,4));
+//    eventList.add(new CharPos(50,50,5));
+//    
+//    createQueue(0);
+    
+  }
+  public void addJunkWithAudio(Minim mn){
+    eventList = new LinkedList<Event>();
+    eventList.add(new CamPos(10,10,2));
+    
+    eventList.add(new Dialog("groove.mp3", 2, mn));
+    
+    eventList.add(new Dialog("groove2.mp3", 60, mn));
+    
+    eventList.add(new CharPos(50,50,4));
+    eventList.add(new CharPos(50,50,5));
+    
+    createQueue(0);
+    
+  }
+  
+  //TODO: everything; make it read from a file.
+  public void populateList(){
+  }
+  //create queue based on where the timeline currently is (destroy current queue, create new queue by getting the current time and
+  //finding the appropriate starting point; naive approach
+  public void createQueue(int startTime){
+    listIt = eventList.listIterator();
+    eventQueue = new LinkedList<Event>();
+    while(listIt.hasNext()){
+      eventQueue.add(listIt.next());
+    }
+  }
+  
+  public boolean eventHappened(int time){
+    if(eventQueue.peek() != null){
+      if(eventQueue.peek().getTimeStamp() == time){
+        return true;  
+      }
+    }
+    return false;
+  }
+  
+  public LinkedList<Event> getCurrentEvents(int time){
+     return null;
+  }
+  
+  public Event peekNextEvent(){
+    return eventQueue.peek();
+  }
+  
+  public Event popEvent(){
+    return eventQueue.poll();
+  }
+  
+  public LinkedList<Event> getEventList(){
+    return eventList; 
+  }
+  
+  public Dialog getPreviousPoppedDialog(int time){
+    
+    Dialog d = null;
+    
+    listIt = eventList.listIterator();
+    while(listIt.hasNext()){
+      Event temp = listIt.next();
+      if(temp.getTimeStamp() > time){
+        break;
+      }
+      if(temp.getType()==DIA_TIME){
+        d=(Dialog)temp;
+      }
+    }
+    return d;
+    
+  }
+  
+}
+/**
+A tick is an event on a timeline that specifically represents a change in the selected camera for that specific time.
+**/
+
+class Tick implements Comparable{
     
     //tick attributes
     float tickXPos, tickYPos, tickWidth, tickHeight;
     final int offCol = color(40,127,80);
-    final int onCol = color(255,0,0);
+    final int errorCol = color(255,0,0);
+    final int onCol = offCol;
     int col;
     boolean active;
     Cam cam;
+    int time;
+    boolean pacingViolation;
+    boolean cutViolation;
     
     //default constructor is only used for testing; do NOT use for normal use yet.
     Tick(){
@@ -1018,6 +1351,8 @@ class Tick{
       tickHeight = tickWidth;
       active = true;
       col = onCol;
+      pacingViolation = false;
+      cutViolation = false;
     }
     
     Tick(float tXPos, float tYPos){
@@ -1028,10 +1363,10 @@ class Tick{
       col = onCol;
     }
     
-    Tick(float tXPos, float tYPos, Cam c){
+    Tick(float tXPos, float tYPos, Cam c, int t){
       this(tXPos, tYPos);
       cam = c;
-      
+      time = t;
     }
     
     public void displayTick(){
@@ -1113,25 +1448,80 @@ class Tick{
       cam.setNextShapeActive();
     }
     
+    public int getTimeStamp(){
+      return time;
+    }
+    
+    public void setPacingViolation(boolean b){
+      pacingViolation = b;
+      if(!b){ col = offCol;}
+      else{col = errorCol;}
+    }
+    
+    public boolean getPacingViolation(){
+      return pacingViolation;
+    }
+    
+    public void setCutViolation(boolean b){
+      cutViolation = b;
+      if(!b){ col = offCol;}
+      else{col = errorCol;}
+    }
+    
+    public boolean getCutViolation(){
+      return cutViolation;
+    }
+    
+    public int compareTo(Object otherTick){
+      if(!(otherTick instanceof Tick)){
+        throw new ClassCastException("Not a valid Tick object!");
+      }
+      
+      Tick tempTick = (Tick)otherTick;
+      
+      if(this.getTimeStamp() > tempTick.getTimeStamp()){
+        return 1;
+      }
+      else if(this.getTimeStamp() < tempTick.getTimeStamp()){
+        return -1;
+      }
+      else{
+        return 0;
+      }
+
+    }
+    
 }
 /**
   Class that holds the timeline object and manages the scrubber and tick placements; this includes playback.
 **/
 
 //TODO: tie the camera data structure with tick management
+
+
 public class Timeline {
   HScrollbar hs1; //scrollbar
+  SceneManager sMan;
+  int curFrame;
+  //audio object
+  
   
   //scrollbar attributes
-  public int hsXPos = 50, hsYPos = height-(height/8), hsWidth=width-100, hsHeight = 25, looseVal = 1, totalTime = 120;
+  public int hsXPos = 50, hsYPos = height-(height/8), hsWidth=width-100, 
+  hsHeight = 25, looseVal = 1, totalTime = 120, fps = 30, disp = 50;
+  
   ArrayList<Tick> tickArr;
+//  ArrayList<Event> eventArr;
   
     
-  Timeline() {
+  Timeline(SceneManager sManager) {
+
+    hs1 = new HScrollbar(hsXPos, hsYPos, hsWidth, hsHeight, looseVal, disp);
+    sMan = sManager;
     
-    hs1 = new HScrollbar(hsXPos, hsYPos, hsWidth, hsHeight, looseVal);
     
     tickArr = new ArrayList();
+//    eventArr = new ArrayList();  //TODO; EVERYTHING WITH EVENTS!
 
   }
   
@@ -1152,17 +1542,13 @@ public class Timeline {
   }
   
   public void addTick(Cam c){
-//      tickArr.add(new Tick());
-////      tickArr.get(tickArr.size()-1).setToActive();
-//      for(int i = 0; i<tickArr.size()-1; i++){
-//        tickArr.get(i).setToInActive();
-//      }
-
-    tickArr.add(new Tick(hs1.getSliderPos(), hsYPos, c));
+    tickArr.add(new Tick(hs1.getSliderPos(), hsYPos, c, hs1.getPosInSeconds()));
     //set the older ticks to inactive
     for(int i = 0; i<tickArr.size()-1; i++){
       tickArr.get(i).setToInActive();
     }
+    //sort the ticks in case one was placed before an existing tick
+    Collections.sort(tickArr);
   }
   
   public ArrayList<Tick> getTickArr(){
@@ -1183,8 +1569,19 @@ public class Timeline {
     hs1.executePlay();
   }
   
+  //used or scrubbing
+  public void setFrame(int frameNum){
+    hs1.setSposWithFrame(frameNum);
+  }
+  
   public void pause(){
+    println(hs1.getSliderPos());
     hs1.executePause();
+    println(hs1.getSliderPos());
+  }
+  
+  public int getScrollbarTimeInSecs(){
+    return hs1.getPosInSeconds();
   }
   
   
@@ -1200,8 +1597,10 @@ public class Timeline {
     Tick prevTick, nextTick;
     long startTime;
     boolean isPlaying = false;
+    int displacement = 0;
   
-    HScrollbar (float xp, float yp, int sw, int sh, int l) {
+    HScrollbar (float xp, float yp, int sw, int sh, int l, int dis) {
+      displacement = dis;
       swidth = sw;
       sheight = sh;
       int widthtoheight = sw - sh;
@@ -1216,7 +1615,25 @@ public class Timeline {
     }
   
     public void update() {
-      if(overEvent()) {
+      
+      
+
+      if(isPlaying){
+        //only plays sound for dialog
+        if(sMan.eventHappened(getPosInSeconds())){
+          //put sound code here!!!
+          sMan.peekNextEvent().execute(getPosInSeconds());
+          println(sMan.popEvent());
+        }
+        
+        //find if previous dialog should still be playing, and if so, play it
+        if(sMan.getPreviousPoppedDialog(getPosInSeconds()) != null){
+          sMan.getPreviousPoppedDialog(getPosInSeconds()).execute(getPosInSeconds());
+//          println(sMan.getPreviousPoppedDialog(getPosInSeconds()));
+        }
+      }
+      
+      if(overSlide()) {
         over = true;
       } else {
         over = false;
@@ -1233,6 +1650,13 @@ public class Timeline {
       }
 
       if(abs(newspos - spos) > 1 || isPlaying) {
+        
+        //if playback has collided with the end of the timeline, stop playing
+        if(isPlaying){
+          if(getPosInSeconds() >= totalTime){
+            executePause();
+          }
+        }
                 
         if(isPlaying){
           long estimatedTime = System.nanoTime() - startTime;
@@ -1240,15 +1664,19 @@ public class Timeline {
           if(estimatedTime/1000000000 >= 1){
             //if one second has passed, make a new start time (reset the second timer)
             startTime = System.nanoTime();
-            println("before spos is " + spos + " time is " + getPosInSeconds());
+//            println("before spos is " + spos + " time is " + getPosInSeconds());
             spos = incrementSposInSeconds();
-            println("after spos is " + spos + " time is " + getPosInSeconds());
+            println("spos is " + spos + " time is " + getPosInSeconds() + " frame is " + getPosInFrames());
           }
         
         }
         else{
           spos = spos + (newspos-spos)/loose;
         }
+      }
+      //if the timeline is NOT playing, create the queue for the events to unfold in order
+      if(!isPlaying){
+        sMan.createQueue(getPosInSeconds()); 
       }
 //      println(getPosInSeconds());
 
@@ -1258,7 +1686,7 @@ public class Timeline {
       return min(max(val, minv), maxv);
     }
   
-    public boolean overEvent() {
+    public boolean overSlide() {
       if(mouseX > xpos && mouseX < xpos+swidth &&
          mouseY > ypos && mouseY < ypos+sheight) {
         return true;
@@ -1279,7 +1707,8 @@ public class Timeline {
         fill(102, 102, 102);
       }
       //scrubber
-      rect(spos, ypos, sheight, sheight);
+      //println(spos);
+      rect(spos-sheight/2, ypos, sheight, sheight);
       
       for(int i = 0; i<tickArr.size(); i++){
         tickArr.get(i).displayTick();
@@ -1313,20 +1742,38 @@ public class Timeline {
       }
 
     }
-    public int getPosInSeconds() {
-      return (int)(((spos-50)/swidth)*totalTime);
+    
+    //todo; this
+    private int incrementSposInFrames(){
+      return 0;
     }
     
-    public int incrementSposInSeconds(){
+    public void setSposWithFrame(int frameNum){
+      spos = fps*frameNum+displacement;
+    }
+    
+    public int getPosInFrames(){
+      return (int)(((spos-displacement)/swidth)*(totalTime))*fps;
+    }
+    
+    public int getPosInSeconds() {
+      return (int)(((spos-displacement)/swidth)*totalTime);
+    }
+    
+    //EVENTUALLY REMOVE THIS FUNCTION; need to rely on incrementFrame instead
+    private int incrementSposInSeconds(){
 //      println(getPosInSeconds());
 //      println("posInSec " + getPosInSeconds() + " swidth+50 " + (swidth+50) + " " + (1/totalTime) + " " + (1.0/totalTime)*swidth*50);
 
-      return (int)(((((float)getPosInSeconds()+ 1.5f)/(totalTime))*swidth)+50);
+      return (int)(((((float)getPosInSeconds()+ 1.5f)/(totalTime))*swidth)+displacement);
       
     }
     
     public float getSliderPos(){
       return spos;
+    }
+    public void setSpos(float s){
+      spos = s;
     }
     
     public void executePlay(){
@@ -1339,9 +1786,9 @@ public class Timeline {
     
     public void executePause(){
       println("pause");
-      //long estimatedTime = System.nanoTime() - startTime;
-      //println(estimatedTime/1000000);    //convert it to milliseconds
       isPlaying = false;
+      
+       
     }
     
   }

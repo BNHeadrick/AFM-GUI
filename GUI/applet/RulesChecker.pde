@@ -1,7 +1,7 @@
 import java.util.ArrayList;
 import processing.opengl.*;
 
-public class RulesChecker {
+public class RulesChecker implements Constants{
   public void checkLineOfAction(ArrayList<Cam> cameras, ArrayList<Character> characters, int selectedIdx) {
     if (cameras == null || cameras.isEmpty()) {
       println("No cameras in the scene!");
@@ -170,5 +170,65 @@ public class RulesChecker {
       }    
     }
     return new PVector(finX, 0, finY);
+  }
+  
+  public void checkCuttingOnAction(SceneManager sm, Timeline tl){
+    LinkedList<Event> eList = sm.getEventList();
+    ArrayList<Tick> tArr = tl.getTickArr();
+    ListIterator<Event> listIt;
+  
+    for(int i = 0; i<tArr.size(); i++){
+//      println("here");
+      listIt = eList.listIterator();
+      while(listIt.hasNext()){
+        Event tempEvent = listIt.next();
+        //check for time colisions.
+//        println("event " + tempEvent.getTimeStamp() + " tick time " + tArr.get(i).getTimeStamp() + " " + tempEvent.type);
+        
+        if((tempEvent.getType()==DIA_TIME) && (tempEvent.getTimeStamp()==tArr.get(i).getTimeStamp())){
+          println("CUTTING ON ACTION ERROR!");
+          tArr.get(i).setCutViolation(true);
+        }
+        else{
+          tArr.get(i).setCutViolation(false);
+        }
+        
+      }
+    }
+
+  }
+  
+  public void checkPacing(SceneManager sm, Timeline tl){
+    ArrayList<Tick> tArr = tl.getTickArr();
+    int[] delTimeArr= new int[tArr.size()-1]; 
+    
+    int total = 0;
+//    int count = 0;
+    if(tArr.size()>1){
+      for(int i = 1; i<tArr.size(); i++){
+        delTimeArr[i-1] = tArr.get(i).getTimeStamp()-tArr.get(i-1).getTimeStamp();
+        total = total + delTimeArr[i-1];
+      }
+      
+      println("current sscrubber is at time " + tl.getScrollbarTimeInSecs() );
+      println("totalTime is " + total);
+      
+      int average = total/(tArr.size()-1);
+      println("totalAverage is " + average);
+      
+      //compare the average to the actual distribution of tick events
+      for(int i = 0; i<delTimeArr.length; i++){
+        if(!(delTimeArr[i] < (average+20) && delTimeArr[i] > (average-20)) || delTimeArr[i]<3){
+          tArr.get(i+1).setPacingViolation(true);
+        }
+        else{
+          if(tArr.get(i+1).getPacingViolation()){
+            tArr.get(i+1).setPacingViolation(false);
+          }
+        }
+      }
+      
+    }
+    
   }
 }

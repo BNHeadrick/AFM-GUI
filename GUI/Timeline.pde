@@ -123,10 +123,20 @@ public class Timeline {
     void update() {
       
       
-      if(sMan.eventHappened(getPosInSeconds())){
-        //put sound code here!!!
-        sMan.peekNextEvent().execute(getPosInSeconds());
-        println(sMan.popEvent());
+
+      if(isPlaying){
+        //only plays sound for dialog
+        if(sMan.eventHappened(getPosInSeconds())){
+          //put sound code here!!!
+          sMan.peekNextEvent().execute(getPosInSeconds());
+          println(sMan.popEvent());
+        }
+        
+        //find if previous dialog should still be playing, and if so, play it
+        if(sMan.getPreviousPoppedDialog(getPosInSeconds()) != null){
+          sMan.getPreviousPoppedDialog(getPosInSeconds()).execute(getPosInSeconds());
+//          println(sMan.getPreviousPoppedDialog(getPosInSeconds()));
+        }
       }
       
       if(overSlide()) {
