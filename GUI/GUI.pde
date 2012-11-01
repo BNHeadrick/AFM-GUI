@@ -303,9 +303,13 @@ void keyPressed() {
         //need to find which tick is before/after the one that would be placed here
         //TODO above
         cameras.add(new Cam(cameras.get(i).getModelViewMatrix()));
-        timeline.addTick(cameras.get(i+1));
+        timeline.addTick(cameras.get(cameras.size()-1));
       }
     }
+  }
+  if (key == 'y' || key == 'Y') {
+    //Scrub (snap) through ticks
+    
   }
   if (key == 'l' || key == 'L') {
     timeline.play();

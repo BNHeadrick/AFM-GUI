@@ -100,7 +100,7 @@ public class Timeline {
     boolean over;           // is the mouse over the slider?
     boolean locked;
     float ratio;
-    Tick prevTick, nextTick;
+    Tick prevTick, nextTick, currTick;
     long startTime;
     boolean isPlaying = false;
     int displacement = 0;
@@ -164,6 +164,7 @@ public class Timeline {
           }
         }
                 
+        //if the timeline is playing, increment the scrubber one second at a time.
         if(isPlaying){
           long estimatedTime = System.nanoTime() - startTime;
           
@@ -222,10 +223,14 @@ public class Timeline {
       
       prevTick = null;
       nextTick = null;
+      currTick = null;
       
       for(int i = 0; i<tickArr.size(); i++){
         if (tickArr.get(i).getXPos() < spos){
-          prevTick = tickArr.get(i);
+          if(i>0){
+            prevTick = tickArr.get(i-1);
+          }
+          currTick = tickArr.get(i);
         }
         else{
           break;
@@ -240,6 +245,9 @@ public class Timeline {
       }
       
       
+      if(currTick != null){
+        currTick.changeCamColorCurr();
+      }
       if(prevTick != null){
         prevTick.changeCamColorPrev();
       }
@@ -250,10 +258,11 @@ public class Timeline {
     }
     
     //todo; this
-    private int incrementSposInFrames(){
-      return 0;
-    }
+//    private int incrementSposInFrames(){
+//      return 0;
+//    }
     
+    //does this really work?  Think about the placement relative to the pixel/frame difference.
     public void setSposWithFrame(int frameNum){
       spos = fps*frameNum+displacement;
     }
@@ -270,7 +279,6 @@ public class Timeline {
     private int incrementSposInSeconds(){
 //      println(getPosInSeconds());
 //      println("posInSec " + getPosInSeconds() + " swidth+50 " + (swidth+50) + " " + (1/totalTime) + " " + (1.0/totalTime)*swidth*50);
-
       return (int)(((((float)getPosInSeconds()+ 1.5)/(totalTime))*swidth)+displacement);
       
     }

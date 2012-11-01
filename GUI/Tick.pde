@@ -107,19 +107,37 @@ class Tick implements Comparable{
       int g=(c>>8)&255;
       int b=c&255; 
 
-      cam.changeToColor( color(r,g,b, 40));
+//      cam.changeToColor( color(r,g,b, 10));
+      cam.changeToColor( color(255, 0, 0, 255));
     }
     
-    void changeCamColorNext(){
+    void changeCamColorCurr(){
       //keep the same color, just change opacity
       color c = cam.getColor();
       
       int r=(c>>16)&255;
       int g=(c>>8)&255;
       int b=c&255; 
+
+//      cam.changeToColor( color(r,g,b, 100));
+      cam.changeToColor( color(0, 255, 0, 255));
+
+    }
+    
+    void changeCamColorNext(){
+      color c = cam.getColor();
       
-      cam.changeToColor( color(r,g,b));
-      cam.setNextShapeActive();
+      int r=(c>>16)&255;
+      int g=(c>>8)&255;
+      int b=c&255; 
+      
+//      cam.changeToColor( color(r,g,b, 200));
+      cam.changeToColor( color(255, 0, 255, 255));
+
+      //below is legacy code crap
+      //cam.setNextShapeActive();
+      
+//      cam.changeToColor( color(0,255,0, 250));
     }
     
     int getTimeStamp(){
