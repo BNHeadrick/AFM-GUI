@@ -1,7 +1,13 @@
 import java.util.ArrayList;
 import processing.opengl.*;
 
+public int threshhold;
 public class RulesChecker implements Constants{
+  
+  public RulesChecker(){
+    threshhold = (int)(.15*totalTime);
+  }
+  
   public void checkLineOfAction(ArrayList<Cam> cameras, ArrayList<Character> characters, int selectedIdx) {
     if (cameras == null || cameras.isEmpty()) {
       println("No cameras in the scene!");
@@ -216,12 +222,13 @@ public class RulesChecker implements Constants{
       println("totalTime is " + total);
       
       int average = total/(tArr.size()-1);
-      println("totalAverage is " + average);
+      println("totalAverage is " + average + " threshhold is " + threshhold);
       
       tl.setPacingText("");
       //compare the average to the actual distribution of tick events
+      /*
       for(int i = 0; i<delTimeArr.length; i++){
-        if(!(delTimeArr[i] < (average+20) && delTimeArr[i] > (average-20)) || delTimeArr[i]<3){
+        if(!(delTimeArr[i] < (average+threshhold) && delTimeArr[i] > (average-threshhold)) || delTimeArr[i]<3){
           tArr.get(i+1).setPacingViolation(true);
           tl.setPacingText("Pacing Violation");
         }
@@ -231,6 +238,53 @@ public class RulesChecker implements Constants{
           }
         }
       }
+      */
+      int clusterCount=-1;
+      boolean startClusterCheck = false;
+      //search for close-together, or far-away, clusters
+      
+      for(int i = 0; i<delTimeArr.length; i++){
+        //if something is within the threshhold to violate the pacing rule, then flag it and check for clusters.
+        //if(!(delTimeArr[i] < (average+threshhold) && delTimeArr[i] > (average-threshhold)) || delTimeArr[i]<(int)(.03*totalTime)){
+          //only checking for clusters, NOT spaced out ticks.
+          if(!(delTimeArr[i] > (average-threshhold)) || delTimeArr[i]<(int)(.03*totalTime)){
+          if(!startClusterCheck){
+            clusterCount++;
+            tArr.get(i).setPacingViolation(true);
+            tArr.get(i+1).setPacingViolation(true);
+            tl.setPacingText("Pacing Violation");
+            startClusterCheck=true;
+            tArr.get(i).setPacingCluster(clusterCount);
+            tArr.get(i+1).setPacingCluster(clusterCount);
+            println("staring check " + i + " " + clusterCount);
+          }
+          else{
+            //if the i+1st is in a cluster, and if the previous was not set to a cluster, ensure it was set.
+            if(tArr.get(i).getPacingCluster()<0){
+              tArr.get(i).setPacingCluster(clusterCount);
+            }
+            
+            tArr.get(i+1).setPacingViolation(true);
+            tArr.get(i+1).setPacingCluster(clusterCount);
+            
+            tl.setPacingText("Pacing Violation");
+          }
+        }
+        
+        else{
+          if(tArr.get(i+1).getPacingViolation()){
+            tArr.get(i+1).setPacingViolation(false);
+            tArr.get(i+1).setPacingCluster(-1);
+          }
+          println("stopedcheck " + i + " " + clusterCount);
+          startClusterCheck = false;
+        }
+      }
+      print("start ");
+      for(int i = 0; i<tArr.size(); i++){
+        println(tArr.get(i).getPacingCluster());
+      }
+      print("end ");
       
     }
     

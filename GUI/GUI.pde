@@ -98,7 +98,7 @@ void setup() {
   ArrayList camFloatBuffers = sm.getCamFloatBuffers();
   int numOfCams = camFloatBuffers.size();
   for(int i = 0; i<numOfCams; i++){
-    cameras.add(new Cam((FloatBuffer)camFloatBuffers.get(i)));
+    cameras.add(new Cam((FloatBuffer)camFloatBuffers.get(i), i));
     
   }
   
@@ -328,7 +328,8 @@ void keyPressed() {
         
         //need to find which tick is before/after the one that would be placed here
         //TODO above
-        cameras.add(new Cam(cameras.get(i).getModelViewMatrix()));
+        //int tempID = cameras.get().
+        cameras.add(new Cam(cameras.get(i).getModelViewMatrix(), 9));
         timeline.addTick(cameras.get(cameras.size()-1));
       }
     }

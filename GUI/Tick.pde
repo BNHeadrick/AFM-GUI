@@ -15,19 +15,19 @@ class Tick implements Comparable{
     int time;
     boolean pacingViolation;
     boolean cutViolation;
+    int pacingCluster;
     
     //default constructor is only used for testing; do NOT use for normal use yet.
-    Tick(){
-      float r = random(50, width-100);
-      tickXPos = r;
-      tickYPos = height-(height/8);
-      tickWidth = 15;
-      tickHeight = tickWidth;
-      active = true;
-      col = onCol;
-      pacingViolation = false;
-      cutViolation = false;
-    }
+//    Tick(){
+//      float r = random(50, width-100);
+//      tickXPos = r;
+//      tickYPos = height-(height/8);
+//      tickWidth = 15;
+//      tickHeight = tickWidth;
+//      active = true;
+//      col = onCol;
+//      
+//    }
     
     Tick(float tXPos, float tYPos){
       tickXPos = tXPos;
@@ -35,17 +35,52 @@ class Tick implements Comparable{
       tickWidth = 15;
       tickHeight = tickWidth;
       col = onCol;
+      pacingViolation = false;
+      cutViolation = false;
+      pacingCluster = -1;
     }
     
     Tick(float tXPos, float tYPos, Cam c, int t){
       this(tXPos, tYPos);
       cam = c;
       time = t;
+      
     }
     
     void displayTick(){
       fill(col);
       ellipse(tickXPos, tickYPos, tickWidth, tickHeight);
+      
+      //draw the arrows for all active violations
+      if(pacingViolation){
+        
+        float x1 = tickXPos, y1=tickYPos-30, x2=tickXPos, y2=tickYPos-13;
+        stroke(255);
+        //float x1 = 400, y1=400, x2=800, y2=800;
+        // draw the line
+        line(x1, y1, x2, y2);
+        pushMatrix();
+        translate(x2, y2);
+        float a = atan2(x1-x2, y2-y1);
+        rotate(a);
+        line(0, 0, -10, -10);
+        line(0, 0, 10, -10);
+        popMatrix();
+      }
+      if(cutViolation){
+        float x1 = tickXPos, y1=tickYPos+30, x2=tickXPos, y2=tickYPos+13;
+        stroke(255);
+        //float x1 = 400, y1=400, x2=800, y2=800;
+        // draw the line
+        line(x1, y1, x2, y2);
+        pushMatrix();
+        translate(x2, y2);
+        float a = atan2(x1-x2, y2-y1);
+        rotate(a);
+        line(0, 0, -10, -10);
+        line(0, 0, 10, -10);
+        popMatrix();
+      }
     }
     
     float getXPos(){
@@ -150,8 +185,16 @@ class Tick implements Comparable{
       else{col = errorCol;}
     }
     
+    public void setPacingCluster(int n){
+      pacingCluster = n;
+    }
+    
     public boolean getPacingViolation(){
       return pacingViolation;
+    }
+    
+    public int getPacingCluster(){
+      return pacingCluster;
     }
     
     public void setCutViolation(boolean b){

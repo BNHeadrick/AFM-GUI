@@ -14,7 +14,7 @@ class Cam {
   boolean isSelected;
   int boxScale = 40;
   boolean isNext = false;
-  
+  int id;
 
   //testing default constructor
   Cam() { 
@@ -31,9 +31,10 @@ class Cam {
 //    this.col = col;
 //  }
 
-  Cam(FloatBuffer modelViewMatrix) {
+  Cam(FloatBuffer modelViewMatrix, int id) {
     this.modelViewMatrix = modelViewMatrix;
     col = defaultCol;
+    this.id = id;
   }
 
   PVector getTranslation() {

@@ -4,7 +4,7 @@
 
 //TODO: tie the camera data structure with tick management
 
-public class Timeline {
+public class Timeline implements Constants{
   HScrollbar hs1; //scrollbar
   SceneManager sMan;
   int curFrame;
@@ -15,7 +15,7 @@ public class Timeline {
   
   //scrollbar attributes
   public int hsXPos = 50, hsYPos = height-(height/8), hsWidth=width-100, 
-  hsHeight = 25, looseVal = 1, totalTime = 120, fps = 30, disp = 50;
+  hsHeight = 25, looseVal = 1, fps = 30, disp = 50;
 
   
   
