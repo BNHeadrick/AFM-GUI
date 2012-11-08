@@ -142,8 +142,8 @@ class Tick implements Comparable{
       int g=(c>>8)&255;
       int b=c&255; 
 
-//      cam.changeToColor( color(r,g,b, 10));
-      cam.changeToColor( color(255, 0, 0, 255));
+      cam.changeToColor( color(r,g,b, 10));
+      //cam.changeToColor( color(255, 0, 0, 255));
     }
     
     void changeCamColorCurr(){
@@ -154,8 +154,8 @@ class Tick implements Comparable{
       int g=(c>>8)&255;
       int b=c&255; 
 
-//      cam.changeToColor( color(r,g,b, 100));
-      cam.changeToColor( color(0, 255, 0, 255));
+      cam.changeToColor( color(r,g,b, 100));
+      //cam.changeToColor( color(0, 255, 0, 255));
 
     }
     
@@ -166,8 +166,8 @@ class Tick implements Comparable{
       int g=(c>>8)&255;
       int b=c&255; 
       
-//      cam.changeToColor( color(r,g,b, 200));
-      cam.changeToColor( color(255, 0, 255, 255));
+      cam.changeToColor( color(r,g,b, 255));
+      //cam.changeToColor( color(255, 0, 255, 255));
 
       //below is legacy code crap
       //cam.setNextShapeActive();

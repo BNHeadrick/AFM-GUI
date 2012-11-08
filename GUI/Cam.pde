@@ -37,6 +37,9 @@ class Cam {
     this.id = id;
   }
 
+  public int getId(){
+    return this.id;
+  }
   PVector getTranslation() {
     if (this.modelViewMatrix == null) {
       println("Model View Matrix is corrupted");
