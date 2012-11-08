@@ -80,51 +80,19 @@ class Cam {
   }
   
   void display() {
-
-
     pushMatrix();
-    
-//    println("Yo! Camera!");
-//    printCamera(); 
-//
-//    println("BAH! Modelview!");
-//    printMatrix();
 
     stroke(0);
-    //    lights();
-    //    translate(160, 160, 0);
+
     float[] matrix = modelViewMatrix.array();
 
-    //translate(matrix[12], matrix[13], matrix[14]);
-    //rotateY(acos(matrix[0]));
-    //rotateX(asin(matrix[1]));
     PMatrix3D myMatrix;
     myMatrix=new PMatrix3D();
     myMatrix.set(matrix);
-    /*
-    println("GAA! Transform Matrix");
-     for (int i=0;i<16;i++){
-     print(matrix[i]);
-     print (" ");
-     if ((i+1)%4==0)
-     println("");
-     }
-     println("");
-     */
+
     myMatrix.transpose();
     applyMatrix(myMatrix);  
-    /* a and d stuff            
-     println("HRMPF! DrawPosition");
-     printMatrix();
-     //rotAngle should be 0 and grow by pressing a and shrink by pressing d
-     rotateY(rotAngle);
-     
-     PMatrix3D anotherMatrix=new PMatrix3D();
-     getMatrix(anotherMatrix);
-     
-     //actually new global transformation for your camera:
-     globalTransform = anotherMatrix * foRealCameraMatrix.invert();
-     */
+
     line(0, 0, 0, 0, 0, 100);
     fill(col);
     box(boxScale);
@@ -148,12 +116,7 @@ class Cam {
   }
 
   void changeToSelectedColor() {
-    /*col = color(
-     int(random(0, 255)),
-     int(random(0, 255)),
-     int(random(0, 255))
-     );
-     */
+
     col = color(255, 255, 255);
   }
 

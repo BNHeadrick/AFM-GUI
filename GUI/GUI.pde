@@ -227,6 +227,7 @@ void draw() { // display things
 
   controlP5.draw();
   timeline.draw();
+  lights();
   
 }
 

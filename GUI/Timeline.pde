@@ -307,8 +307,11 @@ public class Timeline implements Constants{
       //println(spos);
       rect(spos-sheight/2, ypos, sheight, sheight);
       
+      //display the ticks
       for(int i = 0; i<tickArr.size(); i++){
         tickArr.get(i).displayTick();
+        tickArr.get(i).changeCamColorInvis();
+        
       }
       
       prevTick = null;
@@ -333,16 +336,20 @@ public class Timeline implements Constants{
           break;
         }
       }
+
       
       
       if(currTick != null){
         currTick.changeCamColorCurr();
+
       }
       if(prevTick != null){
         prevTick.changeCamColorPrev();
+
       }
       if(nextTick != null){
         nextTick.changeCamColorNext();
+
       }
 
     }

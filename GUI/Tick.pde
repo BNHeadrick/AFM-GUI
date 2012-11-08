@@ -175,6 +175,18 @@ class Tick implements Comparable{
 //      cam.changeToColor( color(0,255,0, 250));
     }
     
+    void changeCamColorInvis(){
+      //keep the same color, just change opacity
+      color c = cam.getColor();
+      
+      int r=(c>>16)&255;
+      int g=(c>>8)&255;
+      int b=c&255; 
+
+      cam.changeToColor( color(r,g,b, 1));
+      //cam.changeToColor( color(255, 0, 0, 255));
+    }
+    
     int getTimeStamp(){
       return time;
     }
