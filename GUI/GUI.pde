@@ -371,12 +371,14 @@ void keyPressed() {
 //    cameras.get(0).junkSetMVM();
 //  }
 
-    /*if (key == 'g') {
+    // test OSC messages: increase playhead by 30 each time we press g
+    if (key == 'g') {
+      playheadFrame += 30;
       OscMessage myMessage = new OscMessage("/setPlayheadFrame/int");
-      //myMessage.add((int)(playheadFrame + 30));
-      /oscP5.send(myMessage, interfaceAddr);
+      myMessage.add(playheadFrame);
+      oscP5.send(myMessage, interfaceAddr);
     }
-    */
+    
 }
 
 /*
