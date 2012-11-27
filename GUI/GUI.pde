@@ -37,6 +37,10 @@ float globalCameraZ = 0;
 
 int winHeight = 720, winWidth = 1280;
 
+int camId;
+int camStartFrame;
+int playheadFrame = 0;
+
 RulesChecker rulesChecker;
 Timeline timeline;
 SceneManager sm;
@@ -64,6 +68,8 @@ void setup() {
 
   picker = new Picker(this);
   oscP5 = new OscP5(this, port);
+  
+  // spoof OSC messages to yourself
   // TODO(sanjeet): Change the address
   interfaceAddr = new NetAddress("127.0.0.1", port);
 
@@ -364,6 +370,13 @@ void keyPressed() {
 //  if (key == 'b' || key == 'B') {
 //    cameras.get(0).junkSetMVM();
 //  }
+
+    /*if (key == 'g') {
+      OscMessage myMessage = new OscMessage("/setPlayheadFrame/int");
+      //myMessage.add((int)(playheadFrame + 30));
+      /oscP5.send(myMessage, interfaceAddr);
+    }
+    */
 }
 
 /*
@@ -393,8 +406,20 @@ void mouseReleased(){
  * Method used to receive messages from Kinnect or MSB in the future
  */
 void oscEvent(OscMessage theOscMessage) {
-
+  println( "OSC EVENT");
+    
+  if (theOscMessage != null && theOscMessage.checkAddrPattern("/cameraAdded")) {
+   println("Camera Added: camera" + camId + " starting at frame " + camStartFrame); 
+    camId = theOscMessage.get(0).intValue();
+     camStartFrame = theOscMessage.get(1).intValue();
+     // TODO: pass a transform matrix to new cameraas too
+     // set to the value of the transform matrix of the camera preceeding it
+     // This allows us to "duplicate" camera angles based on currently placed cameras
+    
+  }
+  
   //Friedrich added this select camera event
+  // TODO: AG refactor for "activeCam"
   if (theOscMessage != null && theOscMessage.checkAddrPattern("/selectActorByName")) {
     println("select Actor!");
     String myNewCamera=theOscMessage.get(0).stringValue();
@@ -461,7 +486,18 @@ void oscEvent(OscMessage theOscMessage) {
    if (theOscMessage != null && theOscMessage.checkAddrPattern("/setPlayheadFrame/int")) {
    currentFrame = theOscMessage.get(0).intValue();
     println("Current Frame: " + currentFrame);
+    
+    timeline.setFrame(currentFrame);
+    
   }
+
+  
+  if (theOscMessage != null && theOscMessage.checkAddrPattern("/cameraRemoved")) {
+     camId = theOscMessage.get(0).intValue();
+    println("Camera Removed: camera" + camId);
+  }
+  
+  
 }
 
 void customize(DropdownList ddl) {

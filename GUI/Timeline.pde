@@ -89,6 +89,7 @@ public class Timeline implements Constants{
   
   //used or scrubbing
   void setFrame(int frameNum){
+    println("is set the frame-thingie");
     hs1.setSposWithFrame(frameNum);
   }
   
