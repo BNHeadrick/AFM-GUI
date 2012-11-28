@@ -362,14 +362,12 @@ public class Timeline implements Constants{
 //      return 0;
 //    }
     
-    //does this really work?  Think about the placement relative to the pixel/frame difference.
+    //mostly works; has a weird issue at a certain point.
     public void setSposWithFrame(int frameNum){
       
       //newspos = frameNum;
-      
-      println("bef " + spos);
-      newspos = fps*frameNum+displacement;
-      println("aft " + spos);
+      //newspos = fps*frameNum+displacement;
+      newspos = displacement+((frameNum*swidth)/(fps*totalTime));
     }
     
     public int getPosInFrames(){
