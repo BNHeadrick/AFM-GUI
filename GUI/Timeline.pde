@@ -94,9 +94,9 @@ public class Timeline implements Constants{
   }
   
   void pause(){
-    println(hs1.getSliderPos());
+    //println(hs1.getSliderPos());
     hs1.executePause();
-    println(hs1.getSliderPos());
+    //println(hs1.getSliderPos());
   }
   
   public int getScrollbarTimeInSecs(){
@@ -176,7 +176,7 @@ public class Timeline implements Constants{
         if(sMan.eventHappened(getPosInSeconds())){
           
           sMan.peekNextEvent().execute(getPosInSeconds());
-          println(sMan.popEvent());
+          //println(sMan.popEvent());
         }
         
         //find if previous dialog should still be playing, and if so, play it
