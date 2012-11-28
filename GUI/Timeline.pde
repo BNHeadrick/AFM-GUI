@@ -165,10 +165,11 @@ public class Timeline implements Constants{
       sposMin = xpos;
       sposMax = xpos + swidth - sheight;
       loose = l;
+      
     }
   
     void update() {
-      
+      println(spos);
       
 
       if(isPlaying){
@@ -221,6 +222,7 @@ public class Timeline implements Constants{
             startTime = System.nanoTime();
 //            println("before spos is " + spos + " time is " + getPosInSeconds());
             spos = incrementSposInSeconds();
+            newspos = spos;
             println("spos is " + spos + " time is " + getPosInSeconds() + " frame is " + getPosInFrames());
           }
         
@@ -362,7 +364,12 @@ public class Timeline implements Constants{
     
     //does this really work?  Think about the placement relative to the pixel/frame difference.
     public void setSposWithFrame(int frameNum){
-      spos = fps*frameNum+displacement;
+      
+      //newspos = frameNum;
+      
+      println("bef " + spos);
+      newspos = fps*frameNum+displacement;
+      println("aft " + spos);
     }
     
     public int getPosInFrames(){
