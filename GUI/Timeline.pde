@@ -120,7 +120,7 @@ public class Timeline implements Constants{
   }
   
   //this is only (and should only) be called when the tickEdit toggle is enabled.
-  public Cam deleteCurrentTick(){
+  public Cam deleteCurrentTickAtScrubLoc(){
     Cam retCam = null;
     for(int i = 0; i<tickArr.size(); i++){
       if(tickArr.get(i).getTimeStamp() == hs1.getPosInSeconds()){
@@ -133,6 +133,32 @@ public class Timeline implements Constants{
     return retCam;
     
   }
+  
+  public Cam deleteCurrentActiveTick(){
+    Cam retCam = null;
+    Tick currTick = null;
+    for(int i = 0; i<tickArr.size(); i++){
+        if (tickArr.get(i).getXPos() < hs1.getSliderPos()){
+          
+          currTick = tickArr.get(i);
+        }
+        else{
+          break;
+        }
+    }
+    
+    for(int i = 0; i<tickArr.size(); i++){
+      if(tickArr.get(i) == currTick){
+        retCam = tickArr.get(i).getCam();
+        tickArr.remove(i);
+        return retCam;
+      }
+
+    }
+    return retCam;
+    
+  }
+  
   
   public void setPacingText(String txt){
     pacingTextarea.setText(txt);
@@ -338,11 +364,11 @@ public class Timeline implements Constants{
           cameras.get(id).changeToSelectedColor();
           cameras.get(id).isSelected = true;
         }
-        */ 
+        
         
         cameras.get(i).setDefaultColor();
         cameras.get(i).isSelected = false;
-        
+        */
         
       }
       
@@ -351,8 +377,16 @@ public class Timeline implements Constants{
           if(i>0){
             prevTick = tickArr.get(i-1);
           }
+          
+          for (int k=0; k<tickArr.size(); k++) {
+            tickArr.get(k).getCam().setDefaultColor();
+            tickArr.get(k).getCam().isSelected = false;
+            tickArr.get(k).changeCamColorInvis();
+          }
+          
           currTick = tickArr.get(i);
-          //currTick.setToActive();
+          tickArr.get(i).getCam().changeToSelectedColor();
+          tickArr.get(i).getCam().isSelected = true;
         }
         else{
           break;

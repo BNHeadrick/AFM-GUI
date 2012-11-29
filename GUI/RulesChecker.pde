@@ -1,3 +1,4 @@
+
 import java.util.ArrayList;
 import processing.opengl.*;
 
@@ -218,11 +219,11 @@ public class RulesChecker implements Constants{
         total = total + delTimeArr[i-1];
       }
       
-      println("current sscrubber is at time " + tl.getScrollbarTimeInSecs() );
-      println("totalTime is " + total);
+      //println("current sscrubber is at time " + tl.getScrollbarTimeInSecs() );
+      //println("totalTime is " + total);
       
       int average = total/(tArr.size()-1);
-      println("totalAverage is " + average + " threshhold is " + threshhold);
+      //println("totalAverage is " + average + " threshhold is " + threshhold);
       
       tl.setPacingText("");
       //compare the average to the actual distribution of tick events
@@ -256,7 +257,7 @@ public class RulesChecker implements Constants{
             startClusterCheck=true;
             tArr.get(i).setPacingCluster(clusterCount);
             tArr.get(i+1).setPacingCluster(clusterCount);
-            println("staring check " + i + " " + clusterCount);
+            //println("staring check " + i + " " + clusterCount);
           }
           else{
             //if the i+1st is in a cluster, and if the previous was not set to a cluster, ensure it was set.
@@ -276,15 +277,15 @@ public class RulesChecker implements Constants{
             tArr.get(i+1).setPacingViolation(false);
             tArr.get(i+1).setPacingCluster(-1);
           }
-          println("stopedcheck " + i + " " + clusterCount);
+          //println("stopedcheck " + i + " " + clusterCount);
           startClusterCheck = false;
         }
       }
-      print("start ");
+      //print("start ");
       for(int i = 0; i<tArr.size(); i++){
-        println(tArr.get(i).getPacingCluster());
+        //println(tArr.get(i).getPacingCluster());
       }
-      print("end ");
+      //print("end ");
       
     }
     

@@ -1,3 +1,4 @@
+//GUI
 import ddf.minim.*;
 import ddf.minim.signals.*;
 import ddf.minim.analysis.*;
@@ -23,11 +24,10 @@ color bGround = color(70, 70, 70);
 int prevID;
 ArrayList<Cam> cameras = new ArrayList<Cam>(); // List of Cameras
 ArrayList<Character> characters = new ArrayList<Character>(); // List of Characters
-
 OscP5 oscP5;
+//int port = 31842; AG - changed port to match KinectFingerTracking
 int port = 31842;
 NetAddress interfaceAddr;
-
 String[] lines;
 int selectedRule;
 int selectedCamera;
@@ -53,7 +53,6 @@ Minim minim;
 int currentFrame;
 
 void setup() {
-  
   minim = new Minim(this);
   size(winWidth, winHeight, OPENGL);
   background(bGround);
@@ -65,9 +64,8 @@ void setup() {
   //customize(ruleChoiceList);
   selectedRule = 0;
   selectedCamera=0;
-  currentFrame = 0;
-  
   gl = ((PGraphicsOpenGL)g).gl;
+  currentFrame = 0;
 
   picker = new Picker(this);
   oscP5 = new OscP5(this, port);
@@ -325,7 +323,7 @@ void keyPressed() {
   }
   if (timeline.tickEditIsOn() && (key == 'x' || key == 'X')) {
     //Scrub (snap) through ticks
-    Cam toBeRemoved = timeline.deleteCurrentTick();
+    Cam toBeRemoved = timeline.deleteCurrentTickAtScrubLoc();
 
 //    println(toBeRemoved);
   
@@ -370,6 +368,12 @@ void keyPressed() {
       OscMessage myMessage = new OscMessage("/cameraAdded/int/int");
       myMessage.add(tempID);
       myMessage.add(timeline.getPosInFrames());
+      oscP5.send(myMessage, interfaceAddr);
+    }
+    
+    if (key == 'm') {
+      OscMessage myMessage = new OscMessage("/cameraRemoved");
+      
       oscP5.send(myMessage, interfaceAddr);
     }
     
@@ -476,10 +480,20 @@ void oscEvent(OscMessage theOscMessage) {
     timeline.setFrame(currentFrame);
     
   }
+
   
   if (theOscMessage != null && theOscMessage.checkAddrPattern("/cameraRemoved")) {
-     camId = theOscMessage.get(0).intValue();
-     println("Camera Removed: camera" + camId);
+    println("camRemoved?");
+      
+      Cam toBeRemoved = timeline.deleteCurrentActiveTick();
+      for(int i = 0; i<cameras.size(); i++){
+        if(cameras.get(i) == toBeRemoved){
+  //        println("removed");
+          cameras.remove(i);
+        }
+      }
+      
+    //println("Camera Removed: camera" + camId);
   }
   
   
