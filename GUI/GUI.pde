@@ -23,10 +23,11 @@ color bGround = color(70, 70, 70);
 int prevID;
 ArrayList<Cam> cameras = new ArrayList<Cam>(); // List of Cameras
 ArrayList<Character> characters = new ArrayList<Character>(); // List of Characters
+
 OscP5 oscP5;
-//int port = 31842; AG - changed port to match KinectFingerTracking
 int port = 31842;
 NetAddress interfaceAddr;
+
 String[] lines;
 int selectedRule;
 int selectedCamera;
@@ -39,7 +40,6 @@ int winHeight = 720, winWidth = 1280;
 
 int camId;
 int camStartFrame;
-int playheadFrame = 0;
 
 RulesChecker rulesChecker;
 Timeline timeline;
@@ -53,6 +53,7 @@ Minim minim;
 int currentFrame;
 
 void setup() {
+  
   minim = new Minim(this);
   size(winWidth, winHeight, OPENGL);
   background(bGround);
@@ -64,6 +65,8 @@ void setup() {
   //customize(ruleChoiceList);
   selectedRule = 0;
   selectedCamera=0;
+  currentFrame = 0;
+  
   gl = ((PGraphicsOpenGL)g).gl;
 
   picker = new Picker(this);
@@ -347,9 +350,9 @@ void keyPressed() {
 
     // test OSC messages: increase playhead by 30 each time we press g
     if (key == 'g') {
-      playheadFrame += 30;
+      currentFrame += 30;
       OscMessage myMessage = new OscMessage("/setPlayheadFrame/int");
-      myMessage.add(playheadFrame);
+      myMessage.add(currentFrame);
       oscP5.send(myMessage, interfaceAddr);
     }
     // test OSC messages: increase playhead by 30 each time we press g
@@ -473,11 +476,10 @@ void oscEvent(OscMessage theOscMessage) {
     timeline.setFrame(currentFrame);
     
   }
-
   
   if (theOscMessage != null && theOscMessage.checkAddrPattern("/cameraRemoved")) {
      camId = theOscMessage.get(0).intValue();
-    println("Camera Removed: camera" + camId);
+     println("Camera Removed: camera" + camId);
   }
   
   
