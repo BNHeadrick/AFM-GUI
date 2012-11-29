@@ -336,7 +336,7 @@ void keyPressed() {
         //need to find which tick is before/after the one that would be placed here
         //TODO above
         int tempID = cameras.get(cameras.size()-1).getId();
-        cameras.add(new Cam(cameras.get(i).getModelViewMatrix(), tempID));
+        cameras.add(new Cam(cameras.get(i).getModelViewMatrix(), tempID+1));
         timeline.addTick(cameras.get(cameras.size()-1));
       }
     }
@@ -378,31 +378,25 @@ void keyPressed() {
       myMessage.add(playheadFrame);
       oscP5.send(myMessage, interfaceAddr);
     }
+    // test OSC messages: increase playhead by 30 each time we press g
+    if (key == 'h') {
+      int tempID = 0;
+      for(int i =0; i<cameras.size(); i++){
+        if(cameras.get(i).camIsSelected()){
+        
+          //need to find which tick is before/after the one that would be placed here
+          //TODO above
+          tempID = cameras.get(cameras.size()-1).getId();
+        }
+      }
+        
+      OscMessage myMessage = new OscMessage("/cameraAdded/int/int");
+      myMessage.add(tempID);
+      myMessage.add(timeline.getPosInFrames());
+      oscP5.send(myMessage, interfaceAddr);
+    }
     
 }
-
-/*
-void mouseReleased(){
- int id = camPicker.get(mouseX, mouseY);
- if (id > -1) {
- for (int i=0; i<cameras.size(); i++) {
- if (i == id) {
- cameras.get(id).changeToDefaultColor();
- }
- }
- }
- 
- id = charPicker.get(mouseX, mouseY);
- if (id > -1) {
- for (int i=0; i<characters.size(); i++) {
- if (i == id) {
- characters.get(id).changeToDefaultColor();
- }
- }
- }
- 
- }
- */
 
 /*
  * Method used to receive messages from Kinnect or MSB in the future
@@ -410,15 +404,26 @@ void mouseReleased(){
 void oscEvent(OscMessage theOscMessage) {
   println( "OSC EVENT");
     
-  if (theOscMessage != null && theOscMessage.checkAddrPattern("/cameraAdded")) {
-   
+  if (theOscMessage != null && theOscMessage.checkAddrPattern("/cameraAdded/int/int")) {
+    println("Camera Added: camera" + camId + " starting at frame " + camStartFrame); 
     camId = theOscMessage.get(0).intValue();
     camStartFrame = theOscMessage.get(1).intValue();
-   
+    
+    for(int i =0; i<cameras.size(); i++){
+      if(cameras.get(i).camIsSelected()){
+        
+        //need to find which tick is before/after the one that would be placed here
+        //TODO above
+        cameras.add(new Cam(cameras.get(i).getModelViewMatrix(), camId));
+        timeline.addTick(cameras.get(cameras.size()-1));
+        timeline.setFrame(camStartFrame);
+      }
+    }
+    
     println("Camera Added: camera" + camId + " starting at frame " + camStartFrame); 
-     // TODO: pass a transform matrix to new cameraas too
-     // set to the value of the transform matrix of the camera preceeding it
-     // This allows us to "duplicate" camera angles based on currently placed cameras
+    // TODO: pass a transform matrix to new cameraas too
+    // set to the value of the transform matrix of the camera preceeding it
+    // This allows us to "duplicate" camera angles based on currently placed cameras
     
   }
   

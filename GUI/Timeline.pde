@@ -89,7 +89,7 @@ public class Timeline implements Constants{
   
   //used or scrubbing
   void setFrame(int frameNum){
-    println("is set the frame-thingie");
+    //println("is set the frame-thingie");
     hs1.setSposWithFrame(frameNum);
   }
   
@@ -113,6 +113,10 @@ public class Timeline implements Constants{
   
   public int getPosInSeconds(){
     return hs1.getPosInSeconds();
+  }
+  
+  public int getPosInFrames(){
+    return hs1.getPosInFrames();
   }
   
   //this is only (and should only) be called when the tickEdit toggle is enabled.
