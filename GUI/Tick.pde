@@ -8,7 +8,9 @@ class Tick implements Comparable{
     float tickXPos, tickYPos, tickWidth, tickHeight;
     final color offCol = color(40,127,80);
     final color errorCol = color(255,0,0);
-    final color onCol = offCol;
+    //final color onCol = offCol;
+    final color onCol = color(255,255,255);
+    color prevCol;
     color col;
     boolean active;
     Cam cam;
@@ -102,14 +104,17 @@ class Tick implements Comparable{
     
     void setToActive(){
       active = true;
+      prevCol = col;
       col = onCol;
+      
     }
     
     void setToInActive(){
       active = false;
-      col = offCol;
+      col = prevCol;
     }
     
+    /*
     void toggleActive(){
       active = !active;
       if(col==onCol)
@@ -117,6 +122,7 @@ class Tick implements Comparable{
       else
         col=onCol;  
     }
+    */
     
     color getCol(){
       return col;

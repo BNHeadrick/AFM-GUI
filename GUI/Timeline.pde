@@ -325,12 +325,34 @@ public class Timeline implements Constants{
       nextTick = null;
       currTick = null;
       
+      //clear out old currTick colors
+      /*
+      for(int i = 0; i<tickArr.size(); i++){
+        tickArr.get(i).setToInActive();
+      }
+      */
+      
+      for (int i=0; i<cameras.size(); i++) {
+        /*
+        if (i == id) {
+          cameras.get(id).changeToSelectedColor();
+          cameras.get(id).isSelected = true;
+        }
+        */ 
+        
+        cameras.get(i).setDefaultColor();
+        cameras.get(i).isSelected = false;
+        
+        
+      }
+      
       for(int i = 0; i<tickArr.size(); i++){
         if (tickArr.get(i).getXPos() < spos){
           if(i>0){
             prevTick = tickArr.get(i-1);
           }
           currTick = tickArr.get(i);
+          //currTick.setToActive();
         }
         else{
           break;

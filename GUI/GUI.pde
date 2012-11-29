@@ -185,22 +185,6 @@ void draw() { // display things
   //  charPicker.stop();
   picker.stop();
 
-
-  //endCamera();
-
-  //  int id = camPicker.get(mouseX, mouseY);
-  //  if (id > -1) {
-  //    for (int i=0; i<cameras.size(); i++) {
-  //      if (i == id) {
-  //        cameras.get(id).changeToSelectedColor();
-  //        cameras.get(id).isSelected = true;
-  //      } else {
-  //        cameras.get(i).setDefaultColor();
-  //        cameras.get(i).isSelected = false;        
-  //      }
-  //    }
-  //  }
-
   //checks for rule violations
   int id = -1;
   for (int i = 0; i<cameras.size(); i++) {
@@ -217,17 +201,7 @@ void draw() { // display things
   rulesChecker.checkCuttingOnAction(sm, timeline);
   rulesChecker.checkPacing(sm, timeline);
 
-  /* This is for camera rotation using a and d
-   resetMatrix();
-   pushMatrix();
-   setMatrix(myCamera);
-   rotate(angle);
-   getMatrix();
-   popMatrix;
-   */
-
   //have to rotate back to original orientation in order to properly display the drop-down menu
-
   rotateX(PI);
   rotateX(HALF_PI);
 
