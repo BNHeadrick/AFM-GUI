@@ -411,9 +411,11 @@ void oscEvent(OscMessage theOscMessage) {
   println( "OSC EVENT");
     
   if (theOscMessage != null && theOscMessage.checkAddrPattern("/cameraAdded")) {
-   println("Camera Added: camera" + camId + " starting at frame " + camStartFrame); 
+   
     camId = theOscMessage.get(0).intValue();
-     camStartFrame = theOscMessage.get(1).intValue();
+    camStartFrame = theOscMessage.get(1).intValue();
+   
+    println("Camera Added: camera" + camId + " starting at frame " + camStartFrame); 
      // TODO: pass a transform matrix to new cameraas too
      // set to the value of the transform matrix of the camera preceeding it
      // This allows us to "duplicate" camera angles based on currently placed cameras

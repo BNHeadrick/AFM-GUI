@@ -169,7 +169,7 @@ public class Timeline implements Constants{
     }
   
     void update() {
-      println(spos);
+      //println(spos);
       
 
       if(isPlaying){
