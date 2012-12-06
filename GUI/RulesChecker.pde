@@ -207,6 +207,7 @@ public class RulesChecker implements Constants{
 
   }
   
+  //This now only checks for cameras spaced beyond the input threshhold of the total time. (var threshhold in this class)
   public void checkPacing(SceneManager sm, Timeline tl){
     ArrayList<Tick> tArr = tl.getTickArr();
     int[] delTimeArr= new int[tArr.size()-1]; 
@@ -219,9 +220,7 @@ public class RulesChecker implements Constants{
         total = total + delTimeArr[i-1];
       }
       
-      //println("current sscrubber is at time " + tl.getScrollbarTimeInSecs() );
-      //println("totalTime is " + total);
-      
+      //what the average would be for camera placement would be if a uniform distribution is desired.
       int average = total/(tArr.size()-1);
       //println("totalAverage is " + average + " threshhold is " + threshhold);
       
@@ -242,50 +241,50 @@ public class RulesChecker implements Constants{
       */
       int clusterCount=-1;
       boolean startClusterCheck = false;
-      //search for close-together, or far-away, clusters
       
+      //search for close-together clusters of cameras
       for(int i = 0; i<delTimeArr.length; i++){
         //if something is within the threshhold to violate the pacing rule, then flag it and check for clusters.
         //if(!(delTimeArr[i] < (average+threshhold) && delTimeArr[i] > (average-threshhold)) || delTimeArr[i]<(int)(.03*totalTime)){
           //only checking for clusters, NOT spaced out ticks.
           if(!(delTimeArr[i] > (average-threshhold)) || delTimeArr[i]<(int)(.03*totalTime)){
-          if(!startClusterCheck){
-            clusterCount++;
-            tArr.get(i).setPacingViolation(true);
-            tArr.get(i+1).setPacingViolation(true);
-            tl.setPacingText("Pacing Violation");
-            startClusterCheck=true;
-            tArr.get(i).setPacingCluster(clusterCount);
-            tArr.get(i+1).setPacingCluster(clusterCount);
-            //println("staring check " + i + " " + clusterCount);
-          }
-          else{
-            //if the i+1st is in a cluster, and if the previous was not set to a cluster, ensure it was set.
-            if(tArr.get(i).getPacingCluster()<0){
+            if(!startClusterCheck){
+              clusterCount++;
+              tArr.get(i).setPacingViolation(true);
+              tArr.get(i+1).setPacingViolation(true);
+              tl.setPacingText("Pacing Violation");
+              startClusterCheck=true;
               tArr.get(i).setPacingCluster(clusterCount);
+              tArr.get(i+1).setPacingCluster(clusterCount);
+              //println("staring check " + i + " " + clusterCount);
             }
-            
-            tArr.get(i+1).setPacingViolation(true);
-            tArr.get(i+1).setPacingCluster(clusterCount);
-            
-            tl.setPacingText("Pacing Violation");
+            else{
+              //if the i+1st is in a cluster, and if the previous was not set to a cluster, ensure it was set.
+              if(tArr.get(i).getPacingCluster()<0){
+                tArr.get(i).setPacingCluster(clusterCount);
+              }
+              
+              tArr.get(i+1).setPacingViolation(true);
+              tArr.get(i+1).setPacingCluster(clusterCount);
+              
+              tl.setPacingText("Pacing Violation");
+            }
           }
-        }
         
-        else{
-          if(tArr.get(i+1).getPacingViolation()){
-            tArr.get(i+1).setPacingViolation(false);
-            tArr.get(i+1).setPacingCluster(-1);
+          else{
+            if(tArr.get(i+1).getPacingViolation()){
+              tArr.get(i+1).setPacingViolation(false);
+              tArr.get(i+1).setPacingCluster(-1);
+            }
+            //println("stopedcheck " + i + " " + clusterCount);
+            startClusterCheck = false;
           }
-          //println("stopedcheck " + i + " " + clusterCount);
-          startClusterCheck = false;
         }
-      }
-      //print("start ");
-      for(int i = 0; i<tArr.size(); i++){
-        //println(tArr.get(i).getPacingCluster());
-      }
-      //print("end ");
+        //print("start ");
+        for(int i = 0; i<tArr.size(); i++){
+          //println(tArr.get(i).getPacingCluster());
+        }
+        //print("end ");
       
     }
     
