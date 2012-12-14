@@ -126,11 +126,11 @@ void setup() {
     for(int i = 0; i<numOfChars; i++){
       characters.add(new Character((FloatBuffer)charFloatBuffers.get(i)));
     }
+    
+    
     //used to setup charMoveEvens
     sm.junkSetData(characters, minim);
     
-    
-
     characters.get(0).col=color(255,255,0);
     characters.get(1).col=color(255,0,255);
     
@@ -186,6 +186,18 @@ void draw() { // display things
   //  charPicker.stop();
   picker.stop();
 
+
+  
+  rulesChecker.checkCuttingOnAction(sm, timeline);
+  rulesChecker.checkPacing(sm, timeline);
+
+  //have to rotate back to original orientation in order to properly display the drop-down menu
+  rotateX(PI);
+  rotateX(HALF_PI);
+
+  controlP5.draw();
+  timeline.draw();
+
   //checks for rule violations
   int id = -1;
   for (int i = 0; i<cameras.size(); i++) {
@@ -198,16 +210,11 @@ void draw() { // display things
         resetAllCams();
     }
   }
+
   
-  rulesChecker.checkCuttingOnAction(sm, timeline);
-  rulesChecker.checkPacing(sm, timeline);
-
-  //have to rotate back to original orientation in order to properly display the drop-down menu
-  rotateX(PI);
-  rotateX(HALF_PI);
-
-  controlP5.draw();
-  timeline.draw();
+  
+    
+  
   lights();
   
 }

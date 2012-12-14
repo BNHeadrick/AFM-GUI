@@ -26,5 +26,6 @@ public class Event implements Constants{
     
   }
 
+  public void reset(){};
   
 }

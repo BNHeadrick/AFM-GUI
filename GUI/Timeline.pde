@@ -203,17 +203,18 @@ public class Timeline implements Constants{
       
 
       if(isPlaying){
+        println(sMan.peekNextEvent());
         //only plays sound for dialog
         if(sMan.eventHappened(getPosInSeconds())){
           
           sMan.peekNextEvent().execute(getPosInSeconds());
-          //println(sMan.popEvent());
+          println(sMan.popEvent());
         }
         
         //find if previous dialog should still be playing, and if so, play it
         if(sMan.getPreviousPoppedDialog(getPosInSeconds()) != null){
           sMan.getPreviousPoppedDialog(getPosInSeconds()).execute(getPosInSeconds());
-//          println(sMan.getPreviousPoppedDialog(getPosInSeconds()));
+//          println(sMan.getPreviousPoppedDialog(getPosInSeconds())); 
         }
       }
       

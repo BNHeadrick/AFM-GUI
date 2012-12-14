@@ -101,4 +101,8 @@ class Character {
     this.modelViewMatrix = fb;
   }
   
+  public FloatBuffer getModelViewMatrix(){
+    return modelViewMatrix;
+  }
+  
 }
