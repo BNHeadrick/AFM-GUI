@@ -502,8 +502,10 @@ void oscEvent(OscMessage theOscMessage) {
       
     //println("Camera Removed: camera" + camId);
   }
-  
-  
+  if(theOscMessage != null && theOscMessage.checkAddrPattern("/activeCamera/int")) {
+    selectedCamera = theOscMessage.get(0).intValue();
+    println("New Camera Selected: "+ selectedCamera);
+  }
 }
 
 void customize(DropdownList ddl) {

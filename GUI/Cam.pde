@@ -97,17 +97,19 @@ class Cam {
     fill(col);
     box(boxScale);
 
-    if (isSelected) {
+    if (isSelected) {     // If this is the currently selected camera
+      // Draw the lines that display the borders of the field of view
       rotateY(radians(fov));
       line(0, 0, 0, 0, 0, 1000);
       rotateY(radians(-2*fov));
       line(0, 0, 0, 0, 0, 1000);
     }
-    if(false){
+/*    if(false){
 //      float[] matrix1 = modelViewMatrix.array();
       fill(color(255, 0, 255));
       ellipse(matrix[12], -matrix[14], 20, 20);
     }
+ */
     popMatrix();
   }
 
