@@ -75,7 +75,7 @@ class Character {
     rotateY(acos(matrix[0]));
     
     fill(col);
-    sphere(30);
+    sphere(3);
 
     stroke(0);
     //line(0, 0, 0, 0, 0, 50);

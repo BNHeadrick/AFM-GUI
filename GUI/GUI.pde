@@ -32,9 +32,9 @@ String[] lines;
 int selectedRule;
 int selectedCamera;
 
-float globalCameraX = 0;
-float globalCameraY = 0;//-200;
-float globalCameraZ = 0;
+float globalCameraX = 600;
+float globalCameraY = 530;//-200;
+float globalCameraZ = -336;
 
 int winHeight = 720, winWidth = 1280;
 
@@ -131,7 +131,7 @@ void setup() {
     //used to setup charMoveEvens
     sm.junkSetData(characters, minim);
     
-    characters.get(0).col=color(255,255,0);
+    characters.get(0).col=color(0,0,255);
     characters.get(1).col=color(255,0,255);
     
     timeline = new Timeline(sm, controlP5);
@@ -288,21 +288,27 @@ void mouseDragged() {
 void keyPressed() {
   if (key == 'q' || key == 'Q') {
     globalCameraY --;
+    println("GCY: "+globalCameraY);
   } 
   if (key == 'e' || key == 'E') {
     globalCameraY ++;
+    println("GCY: "+globalCameraY);
   }
   if (key == 'w' || key == 'W') {
     globalCameraZ --;
+    println("GCZ: "+globalCameraZ);
   }
   if (key == 'a' || key == 'A') {
     globalCameraX ++;
+    println("GCX: "+globalCameraX);
   }
   if (key == 's' || key == 'S') {
     globalCameraZ ++;
+    println("GCZ: "+globalCameraZ);
   }
   if (key == 'd' || key == 'D') {
     globalCameraX --;
+    println("GCX: "+globalCameraX);
   }
   if (key == ' ') {
     if (selectedRule == 0)
@@ -454,26 +460,45 @@ void oscEvent(OscMessage theOscMessage) {
 
     for (int i=1; i<=16; i++) {
       if (i > 12 && i <= 15) {
-        matrix[i-1] = theOscMessage.get(i).floatValue() * 10;
+        //matrix[i-1] = theOscMessage.get(i).floatValue() * 10;
+        matrix[i-1] = theOscMessage.get(i).floatValue(); // No 10x scale
       } 
       else {
         matrix[i-1] = theOscMessage.get(i).floatValue();
       }
     }
-
+/*
     matrix[2]=-matrix[2];
     matrix[8]=-matrix[8];
     
     //Friedrich - manual scaling adjustments
     matrix[12]=(700-matrix[12])*2.0;
     matrix[14]=matrix[14] * 1.5;
-    //println (matrix[12]);
 
     FloatBuffer fb = FloatBuffer.allocate(16);
     fb = FloatBuffer.wrap(matrix);
     // TODO(sanjeet): Currently using only camera 5
     // Change this variable based on the data received from OSC
     //    int selectedCamera = 5;
+*/
+
+    // NEW CODE
+    matrix[12]=matrix[12];
+    matrix[14]=matrix[14];
+    matrix[2]=-matrix[2];
+    matrix[8]=-matrix[8];
+   
+    println("----------");
+    println(matrix[0]+","+matrix[1]+","+matrix[2]+","+matrix[3]);
+    println(matrix[4]+","+matrix[5]+","+matrix[6]+","+matrix[7]);
+    println(matrix[8]+","+matrix[9]+","+matrix[10]+","+matrix[11]);
+    println(matrix[12]+","+matrix[13]+","+matrix[14]+","+matrix[15]);
+     println("----------");
+
+    
+    // END NEW CODE
+    FloatBuffer fb = FloatBuffer.allocate(16);
+    fb = FloatBuffer.wrap(matrix);
     cameras.get(selectedCamera).modelViewMatrix = fb;
   }
   

@@ -43,11 +43,16 @@ public class SceneManager implements Constants {
     
     charFloatBuffers = new ArrayList<FloatBuffer>();
     
-    float[] matrix2 = {1.0f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f, 240.0f, 000.0f, -350.0f, 1f};
+//    float[] matrix2 = {1.0f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f, 240.0f, 000.0f, -350.0f, 1f};
+    float[] matrix2 = {1.0f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f, 30.0f, 000.0f, -23.8f, 1f};
     charFloatBuffers.add(FloatBuffer.wrap(matrix2));
     
-    float[] matrix3 = {1.0f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f, 800.0f, 000.0f, -350.0f, 1f};
+//    float[] matrix3 = {1.0f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f, 800.0f, 000.0f, -350.0f, 1f};
+    float[] matrix3 = {1.0f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f, 53.0f, 000.0f, -23.8f, 1f};
     charFloatBuffers.add(FloatBuffer.wrap(matrix3));
+    
+    
+    
     
 //    camPosList = new LinkedList<Event>();
 //    charPosList = new LinkedList<Event>();

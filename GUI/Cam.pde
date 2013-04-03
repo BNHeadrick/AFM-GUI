@@ -12,7 +12,7 @@ class Cam {
   draggedCol = color(0, 0, 0), selectedCol = color(255, 255, 255);
   FloatBuffer modelViewMatrix = FloatBuffer.allocate(16);
   boolean isSelected;
-  int boxScale = 40;
+  int boxScale = 4;
   boolean isNext = false;
   int id;
 
